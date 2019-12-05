@@ -2,17 +2,26 @@ package com.liggger.imagemanagement.views;
 
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.liggger.imagemanagement.R;
+import com.liggger.imagemanagement.viewmodels.HomeViewModel;
+
+import pl.aprilapps.easyphotopicker.EasyImage;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,9 +36,20 @@ public class HomeStopFragment extends Fragment {
         return root;
     }
 
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        initEasyImage();
+
+        FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.fab_camera);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EasyImage.openCamera(getActivity(), 0);
+            }
+        });
+
         Button button = getView().findViewById(R.id.Stop);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,4 +59,14 @@ public class HomeStopFragment extends Fragment {
             }
         });
     }
+
+    private void initEasyImage() {
+        EasyImage.configuration(getContext())
+                .setImagesFolderName("EasyImage sample")
+                .setCopyTakenPhotosToPublicGalleryAppFolder(true)
+                .setCopyPickedImagesToPublicGalleryAppFolder(false)
+                .setAllowMultiplePickInGallery(true);
+    }
+
+
 }

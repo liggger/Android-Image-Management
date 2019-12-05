@@ -4,10 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,7 +35,7 @@ public class PathFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         pathViewModel =
                 ViewModelProviders.of(this).get(PathViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_paths, container, false);
+        View root = inflater.inflate(R.layout.fragment_path, container, false);
         initData();
 
         recyclerView = root.findViewById(R.id.recycler_view);
@@ -41,6 +45,19 @@ public class PathFragment extends Fragment {
         recyclerView.setAdapter(pathAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
         return root;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        ImageView imageView = getView().findViewById(R.id.imageView);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavController controller = Navigation.findNavController(v);
+                controller.navigate(R.id.action_navigation_paths_to_pathImageFragment);
+            }
+        });
     }
 
     private void initData() {

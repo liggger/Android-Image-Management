@@ -31,7 +31,7 @@ public class PathAdapter extends RecyclerView.Adapter<PathAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_path, parent, false);
         ViewHolder holder = new ViewHolder(v);
         return holder;
     }

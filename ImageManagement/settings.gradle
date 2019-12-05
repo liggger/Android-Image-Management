@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='ComNavigation'
+rootProject.name='ImageManagement'

@@ -19,7 +19,11 @@
         android:id="@+id/navigation_paths"
         android:name="com.liggger.imagemanagement.views.PathFragment"
         android:label="@string/title_detail"
-        tools:layout="@layout/fragment_paths" />
+        tools:layout="@layout/fragment_path" >
+        <action
+            android:id="@+id/action_navigation_paths_to_pathImageFragment"
+            app:destination="@id/pathImageFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_detail"
@@ -34,5 +38,14 @@
         <action
             android:id="@+id/action_homeStopFragment_to_navigation_home"
             app:destination="@id/navigation_home" />
+    </fragment>
+    <fragment
+        android:id="@+id/pathImageFragment"
+        android:name="com.liggger.imagemanagement.views.PathImageFragment"
+        android:label="fragment_path_image"
+        tools:layout="@layout/fragment_path_image" >
+        <action
+            android:id="@+id/action_pathImageFragment_to_navigation_paths"
+            app:destination="@id/navigation_paths" />
     </fragment>
 </navigation>

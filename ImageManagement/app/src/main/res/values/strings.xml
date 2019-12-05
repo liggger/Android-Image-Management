@@ -15,4 +15,5 @@
     <string name="Paths">Paths</string>
     <string name="Date">Date</string>
     <string name="pathTitle">pathTitle</string>
+    <string name="pathToImagePath">pathToImagePath</string>
 </resources>

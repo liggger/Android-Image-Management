@@ -50,3 +50,22 @@ Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.rest_work_
 Bitmap bitmap = ((BitmapDrawable)getResources().getDrawable(R.mipmap.workstack)).getBitmap();
 ```
 
+### **三、缩小图片**
+
+```java
+private Bitmap scaleBitmap(Bitmap origin, float ratio) {
+        if (origin == null) {
+            return null;
+        }
+        int width = origin.getWidth();
+        int height = origin.getHeight();
+        Matrix matrix = new Matrix();
+        matrix.preScale(ratio, ratio);
+        Bitmap newBM = Bitmap.createBitmap(origin, 0, 0, width, height, matrix, false);
+        if (newBM.equals(origin)) {
+            return newBM;
+        }
+        origin.recycle();
+        return newBM;
+}
+```

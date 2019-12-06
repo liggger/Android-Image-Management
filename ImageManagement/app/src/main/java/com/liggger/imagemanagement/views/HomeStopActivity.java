@@ -1,31 +1,26 @@
-package uk.ac.shef.oak.storeimage;
+package com.liggger.imagemanagement.views;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.liggger.imagemanagement.R;
+import com.liggger.imagemanagement.model.Image;
+import com.liggger.imagemanagement.viewmodels.ImageViewModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,7 +29,7 @@ import java.util.List;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
 
-public class MainActivity extends AppCompatActivity {
+public class HomeStopActivity extends AppCompatActivity {
     private ImageView imageView;
     private ImageViewModel imageViewModel;
     private int REQUEST_CODE_PERMISSIONS = 101;
@@ -44,27 +39,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home_stop);
 
-        activity= this;
-        imageView = (ImageView) findViewById(R.id.imageView);
-
-        // Convert the bitmap to byte[]
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.p_2, null);
-        byte[] a = getBitmapAsByteArray(bitmap);
-
+        activity = this;
         imageViewModel = ViewModelProviders.of(this).get(ImageViewModel.class);
-        getImage(imageViewModel);
 
         System.out.println(allPermissionsGranted());
+
         if(allPermissionsGranted()){
             initEasyImage(); //start camera if permission has been granted by user
             System.out.println("yes");
         } else{
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
-
-        initEasyImage();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_camera);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -74,35 +61,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    public void insertImage(ImageViewModel imageViewModel, byte[] a) {
-        Image image = new Image(a);
-        imageViewModel.insertOneImage(image);
-    }
-
-    public void getImage(ImageViewModel imageViewModel) {
-        LiveData<Image> image = imageViewModel.getImageToDisplay();
-        imageViewModel.getImageToDisplay().observe(this, new Observer<Image>() {
-            @Override
-            public void onChanged(Image image) {
-                if (image == null) {
-                    System.out.println("NO");
-                } else {
-                    byte[] a = image.getImage();
-                    Bitmap test = BitmapFactory.decodeByteArray(a, 0, a.length);
-                    System.out.println("YES");
-                    imageView.setImageBitmap(test);
-                }
-            }
-        });
-    }
-
-    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-        return outputStream.toByteArray();
-    }
-
 
     private void initEasyImage() {
         EasyImage.configuration(this)
@@ -125,13 +83,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onImagesPicked(List<File> imageFiles, EasyImage.ImageSource source, int type) {
-                System.out.println(imageFiles.size());
-                System.out.println(imageFiles);
                 Bitmap bitmap= BitmapFactory.decodeFile(imageFiles.get(0).getAbsolutePath());
                 Bitmap scaleBitmap = scaleBitmap(bitmap, 0.25f);
                 imageView.setImageBitmap(scaleBitmap);
-                byte[] a = getBitmapAsByteArray(bitmap);
-//                insertImage(imageViewModel, a);
+                byte[] picture = getBitmapAsByteArray(scaleBitmap);
+                insertImage(imageViewModel, picture);
             }
 
             @Override
@@ -143,6 +99,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void insertImage(ImageViewModel imageViewModel, byte[] a) {
+        Image image = new Image(a);
+        imageViewModel.insertOneImage(image);
+    }
+
+    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        return outputStream.toByteArray();
     }
 
     @Override
@@ -187,5 +154,4 @@ public class MainActivity extends AppCompatActivity {
         origin.recycle();
         return newBM;
     }
-
 }

@@ -4,30 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
+    tools:context=".views.HomeStopActivity">
+    <Button
+        android:id="@+id/Stop"
+        android:layout_width="300sp"
         android:layout_height="wrap_content"
+        android:background="@color/buttonBackground"
+        android:text="@string/Stop"
+        android:textColor="@android:color/background_light"
+        android:textColorHint="@color/buttonBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/p_1"
-        android:contentDescription="TODO" />
+        app:layout_constraintVertical_bias="0.802" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_camera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="160dp"
+        android:layout_marginBottom="204dp"
         android:clickable="true"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.712"
+        app:layout_constraintHorizontal_bias="0.802"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_add_a_photo_black_24dp"
-        android:focusable="true" />
-
+        app:srcCompat="@drawable/ic_add_a_photo_black_24dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

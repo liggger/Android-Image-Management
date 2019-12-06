@@ -10,11 +10,11 @@ public class Image {
     @ColumnInfo(name = "image_id")
     private int image_id;
 
-    @ColumnInfo(name = "temperature")
-    private int temperature;
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
+    private byte[] picture;
 
-    public Image(int temperature) {
-        this.temperature = temperature;
+    public Image(byte[] picture) {
+        this.picture = picture;
     }
 
     public int getImage_id() {
@@ -25,11 +25,11 @@ public class Image {
         this.image_id = image_id;
     }
 
-    public int getTemperature() {
-        return temperature;
+    public byte[] getPicture() {
+        return picture;
     }
 
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
+    public void setPicture(byte[] picture) {
+        this.picture = picture;
     }
 }

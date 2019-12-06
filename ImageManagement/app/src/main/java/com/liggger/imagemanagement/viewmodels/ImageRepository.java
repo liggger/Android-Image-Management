@@ -19,11 +19,6 @@ public class ImageRepository {
         imageDao = imageDatabase.getImageDao();
     }
 
-    public void generateNewImage() {
-        Random r = new Random();
-        int i1 = r.nextInt(10000) + 1;
-        new InsertAsyncTask(imageDao).execute(new Image(i1));
-    }
 
     public void insertOneImage(Image image) {
         new InsertAsyncTask(imageDao).execute(image);

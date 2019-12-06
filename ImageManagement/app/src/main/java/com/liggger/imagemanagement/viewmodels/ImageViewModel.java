@@ -30,8 +30,5 @@ public class ImageViewModel extends AndroidViewModel {
     public void insertOneImage(Image image) {
         imageRepository.insertOneImage(image);
     }
-    public void generateNewImage() {
-        imageRepository.generateNewImage();
-    }
 
 }

@@ -1,5 +1,6 @@
 package com.liggger.imagemanagement.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,8 +45,10 @@ public class HomeFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavController controller = Navigation.findNavController(v);
-                controller.navigate(R.id.action_navigation_home_to_homeStopFragment);
+//                NavController controller = Navigation.findNavController(v);
+//                controller.navigate(R.id.action_navigation_home_to_homeStopFragment);
+                Intent intent = new Intent(getActivity(), HomeStopActivity.class);
+                startActivity(intent);
             }
         });
     }

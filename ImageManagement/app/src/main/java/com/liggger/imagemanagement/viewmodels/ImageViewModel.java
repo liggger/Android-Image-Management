@@ -14,10 +14,13 @@ public class ImageViewModel extends AndroidViewModel {
 
     private LiveData<Image> imageToDisplay;
 
+    private LiveData<Image> images;
+
     public ImageViewModel(@NonNull Application application) {
         super(application);
         imageRepository = new ImageRepository(application);
         imageToDisplay = imageRepository.getOneImage();
+        images = imageRepository.getImages();
     }
 
     public LiveData<Image> getImageToDisplay() {
@@ -25,6 +28,13 @@ public class ImageViewModel extends AndroidViewModel {
             imageToDisplay = new MutableLiveData<Image>();
         }
         return imageToDisplay;
+    }
+
+    public LiveData<Image> getImages() {
+        if (images == null) {
+            images = new MutableLiveData<Image>();
+        }
+        return images;
     }
 
     public void insertOneImage(Image image) {

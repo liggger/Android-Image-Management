@@ -28,6 +28,10 @@ public class ImageRepository {
         return imageDao.getOneImage();
     }
 
+    public LiveData<Image> getImages() {
+        return imageDao.getImages();
+    }
+    
     private static class InsertAsyncTask extends AsyncTask<Image, Void, Void> {
         private ImageDao imageDao;
 

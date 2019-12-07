@@ -12,4 +12,7 @@ public interface ImageDao {
 
     @Query("SELECT * FROM Image LIMIT 1")
     LiveData<Image> getOneImage();
+
+    @Query("SELECT * FROM IMAGE")
+    LiveData<Image> getAllImages();
 }

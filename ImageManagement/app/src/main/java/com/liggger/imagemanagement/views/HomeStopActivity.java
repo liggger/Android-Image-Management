@@ -30,7 +30,6 @@ import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
 
 public class HomeStopActivity extends AppCompatActivity {
-    private ImageView imageView;
     private ImageViewModel imageViewModel;
     private int REQUEST_CODE_PERMISSIONS = 101;
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
@@ -83,9 +82,9 @@ public class HomeStopActivity extends AppCompatActivity {
 
             @Override
             public void onImagesPicked(List<File> imageFiles, EasyImage.ImageSource source, int type) {
+                System.out.println(imageFiles.get(0).getAbsolutePath());
                 Bitmap bitmap= BitmapFactory.decodeFile(imageFiles.get(0).getAbsolutePath());
                 Bitmap scaleBitmap = scaleBitmap(bitmap, 0.25f);
-                imageView.setImageBitmap(scaleBitmap);
                 byte[] picture = getBitmapAsByteArray(scaleBitmap);
                 insertImage(imageViewModel, picture);
             }

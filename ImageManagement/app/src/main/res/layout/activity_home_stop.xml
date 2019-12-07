@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".views.HomeStopActivity">
+
     <Button
         android:id="@+id/Stop"
         android:layout_width="300sp"
@@ -32,4 +33,5 @@
         app:layout_constraintHorizontal_bias="0.802"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_add_a_photo_black_24dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

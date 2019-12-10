@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.PathImageFragment">
+    tools:context="com.liggger.com4510.views.PathImageFragment">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"

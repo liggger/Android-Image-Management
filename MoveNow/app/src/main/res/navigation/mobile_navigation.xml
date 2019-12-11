@@ -32,7 +32,7 @@
         tools:layout="@layout/fragment_detail" />
     <fragment
         android:id="@+id/homeStopFragment"
-        android:name="uk.ac.shef.oak.com4510.views.HomeStopFragment"
+        android:name="uk.ac.shef.oak.com4510.views.Home.HomeStopFragment"
         android:label="fragment_home_stop"
         tools:layout="@layout/fragment_home_stop" >
         <action

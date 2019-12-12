@@ -19,7 +19,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import uk.ac.shef.oak.com4510.R;
@@ -34,12 +38,17 @@ public class PathFragment extends Fragment {
     private PathAdapter pathAdapter;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
+    private SimpleDateFormat sdf;
+    private Calendar calendar;
+    private Date date;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         pathViewModel =
                 ViewModelProviders.of(this).get(PathViewModel.class);
         View root = inflater.inflate(R.layout.fragment_path, container, false);
+
+        initData(pathViewModel);
 
         pathViewModel.getPaths().observe(this, new Observer<List<Path>>() {
             @Override
@@ -73,11 +82,24 @@ public class PathFragment extends Fragment {
         });
     }
 
-//    private void initData(PathViewModel pathViewModel) {
-//        Path path1 = new Path( "Walk to the 7 bridges");
-//        Path path2 = new Path("Walk to the diamond");
-//        pathViewModel.insertPath(path1);
-//        pathViewModel.insertPath(path2);
-//
-//    }
+    private void initData(PathViewModel pathViewModel) {
+        sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        try {
+            date = sdf.parse(sdf.format(calendar.getInstance().getTime()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        List<Double> latitude = new ArrayList<>();
+        List<Double> longitude = new ArrayList<>();
+        latitude.add(1.2);
+        latitude.add(2.4);
+
+        longitude.add(1.2);
+        longitude.add(2.4);
+        Path path1 = new Path( "Walk to the 7 bridges", date, latitude, longitude);
+        Path path2 = new Path("Walk to the diamond", date, latitude, longitude);
+        pathViewModel.insertPath(path1);
+        pathViewModel.insertPath(path2);
+
+    }
 }

@@ -16,19 +16,28 @@ public class PathViewModel extends AndroidViewModel {
 
     private LiveData<List<Path>> paths;
 
-    private MutableLiveData<String> mText;
+    private LiveData<Path> path;
 
     public PathViewModel(@NonNull Application application) {
         super(application);
         pathRepository = new PathRepository(application);
         paths = pathRepository.getPaths();
+        path = pathRepository.getOnePath();
     }
 
     public LiveData<List<Path>> getPaths() {
         return paths;
     }
 
+    public LiveData<Path> getOnePath() {
+        return path;
+    }
+
     public void insertPath(Path path) {
         pathRepository.insertPath(path);
+    }
+
+    public void updatePath(Path path) {
+        pathRepository.updatePath(path);
     }
 }

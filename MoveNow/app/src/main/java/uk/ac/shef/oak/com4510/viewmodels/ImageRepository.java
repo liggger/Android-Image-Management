@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 
+import java.util.List;
+
 import uk.ac.shef.oak.com4510.model.Image;
 import uk.ac.shef.oak.com4510.model.ImageDao;
 import uk.ac.shef.oak.com4510.model.ImageDatabase;
@@ -28,7 +30,11 @@ public class ImageRepository {
     public LiveData<Image> getImages() {
         return imageDao.getImages();
     }
-    
+
+    public LiveData<List<Image>> findImagesByPath(int path_id) {
+        return imageDao.findImagesByPath(path_id);
+    }
+
     private static class InsertAsyncTask extends AsyncTask<Image, Void, Void> {
         private ImageDao imageDao;
 

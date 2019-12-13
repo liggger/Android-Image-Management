@@ -16,4 +16,5 @@
     <string name="Date">Date</string>
     <string name="pathTitle">pathTitle</string>
     <string name="pathToImagePath">pathToImagePath</string>
+    <string name="title">Title</string>
 </resources>

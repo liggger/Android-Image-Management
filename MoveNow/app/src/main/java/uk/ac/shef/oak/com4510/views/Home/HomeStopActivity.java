@@ -59,15 +59,21 @@ import uk.ac.shef.oak.com4510.viewmodels.ImageViewModel;
 import uk.ac.shef.oak.com4510.viewmodels.PathViewModel;
 
 public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCallback {
+    private static final int ACCESS_FINE_LOCATION = 123;
+    private static final int REQUEST_CODE_PERMISSIONS = 101;
+    private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
+
     private ImageViewModel imageViewModel;
     private PathViewModel pathViewModel;
-    private static final int ACCESS_FINE_LOCATION = 123;
-    private int REQUEST_CODE_PERMISSIONS = 101;
+
+    private GoogleMap mMap;
+    private Image image;
+    private Path imagePath;
+    private int pathId;
+
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationClient;
-    private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
     private Activity activity;
-    private GoogleMap mMap;
     private Location mCurrentLocation;
     private String mLastUpdateTime;
     private ArrayList<LatLng> route = new ArrayList<>();
@@ -75,15 +81,11 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
     private ArrayList<Double> currentLongitudeList = new ArrayList<>();
     private Polyline polyline;
     private Pressure_and_Temperature pressure_and_temperature = new Pressure_and_Temperature();
-    private String temperature;
-    private String pressure;
+    private String temperature, pressure;
     private Chronometer chronometer;
-    private Image image;
     private SimpleDateFormat sdf;
     private Calendar calendar;
     private Date date;
-    private Path imagePath;
-    private int pathId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,7 +196,7 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         }
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setFastestInterval(20000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null /* Looper */);
@@ -240,17 +242,12 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                             mLocationCallback, null /* Looper */);
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
                 return;
             }
 
         }
     }
-
 
     private void initEasyImage() {
         EasyImage.configuration(this)
@@ -302,19 +299,6 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
         return outputStream.toByteArray();
     }
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//
-//        if(requestCode == REQUEST_CODE_PERMISSIONS){
-//            if(allPermissionsGranted()){
-//                initEasyImage();
-//            } else{
-//                Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
-//                finish();
-//            }
-//        }
-//    }
 
     private boolean allPermissionsGranted(){
 

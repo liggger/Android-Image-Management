@@ -46,9 +46,8 @@ public class PathFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         pathViewModel =
                 ViewModelProviders.of(this).get(PathViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_path, container, false);
 
-        initData(pathViewModel);
+        View root = inflater.inflate(R.layout.fragment_path, container, false);
 
         pathViewModel.getPaths().observe(this, new Observer<List<Path>>() {
             @Override
@@ -72,34 +71,14 @@ public class PathFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ImageView imageView = getView().findViewById(R.id.imageView);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavController controller = Navigation.findNavController(v);
-                controller.navigate(R.id.action_navigation_paths_to_pathImageFragment);
-            }
-        });
+//        ImageView imageView = getView().findViewById(R.id.imageView);
+//        imageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                NavController controller = Navigation.findNavController(v);
+//                controller.navigate(R.id.action_navigation_paths_to_pathImageFragment);
+//            }
+//        });
     }
 
-    private void initData(PathViewModel pathViewModel) {
-        sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        try {
-            date = sdf.parse(sdf.format(calendar.getInstance().getTime()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        List<Double> latitude = new ArrayList<>();
-        List<Double> longitude = new ArrayList<>();
-        latitude.add(1.2);
-        latitude.add(2.4);
-
-        longitude.add(1.2);
-        longitude.add(2.4);
-        Path path1 = new Path( "Walk to the 7 bridges", date, latitude, longitude);
-        Path path2 = new Path("Walk to the diamond", date, latitude, longitude);
-        pathViewModel.insertPath(path1);
-        pathViewModel.insertPath(path2);
-
-    }
 }

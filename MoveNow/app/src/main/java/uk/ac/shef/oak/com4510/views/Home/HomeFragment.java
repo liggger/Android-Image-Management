@@ -6,12 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 
@@ -28,7 +28,7 @@ import uk.ac.shef.oak.com4510.viewmodels.PathViewModel;
 public class HomeFragment extends Fragment {
 
     private PathViewModel pathViewModel;
-    private TextView title;
+    private EditText title;
     private Button start;
     private Date date;
     private Calendar calendar;
@@ -45,7 +45,7 @@ public class HomeFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        title = getView().findViewById(R.id.Title);
+        title = getView().findViewById(R.id.editText);
         start = getView().findViewById(R.id.Start);
         start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,7 +58,8 @@ public class HomeFragment extends Fragment {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Path path = new Path(String.valueOf(title), date, null, null);
+                System.out.println("!!!!" + title.getText().toString());
+                Path path = new Path(title.getText().toString(), date, null, null);
                 insertPath(pathViewModel, path);
                 Intent intent = new Intent(getActivity(), HomeStopActivity.class);
                 startActivity(intent);

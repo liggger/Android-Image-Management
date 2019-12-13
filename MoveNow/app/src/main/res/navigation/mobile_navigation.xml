@@ -21,8 +21,8 @@
         android:label="@string/title_detail"
         tools:layout="@layout/fragment_path" >
         <action
-            android:id="@+id/action_navigation_paths_to_pathImageFragment"
-            app:destination="@id/pathImageFragment" />
+            android:id="@+id/action_navigation_paths_to_pathDetailFragment"
+            app:destination="@id/pathDetailFragment" />
     </fragment>
 
     <fragment
@@ -30,6 +30,7 @@
         android:name="uk.ac.shef.oak.com4510.views.Detail.DetailFragment"
         android:label="@string/title_paths"
         tools:layout="@layout/fragment_detail" />
+
     <fragment
         android:id="@+id/homeStopFragment"
         android:name="uk.ac.shef.oak.com4510.views.Home.HomeStopFragment"
@@ -43,9 +44,10 @@
         android:id="@+id/pathImageFragment"
         android:name="uk.ac.shef.oak.com4510.views.Path.PathImageFragment"
         android:label="fragment_path_image"
-        tools:layout="@layout/fragment_path_image" >
-        <action
-            android:id="@+id/action_pathImageFragment_to_navigation_paths"
-            app:destination="@id/navigation_paths" />
-    </fragment>
+        tools:layout="@layout/fragment_path_image" />
+    <fragment
+        android:id="@+id/pathDetailFragment"
+        android:name="uk.ac.shef.oak.com4510.views.Path.PathDetailFragment"
+        android:label="fragment_path_detail"
+        tools:layout="@layout/fragment_path_detail" />
 </navigation>

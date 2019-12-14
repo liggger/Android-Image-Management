@@ -9,12 +9,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import uk.ac.shef.oak.com4510.R;
@@ -55,17 +55,12 @@ public class PathImageAdapter extends RecyclerView.Adapter<PathImageAdapter.View
     //填充视图
     @Override
     public void onBindViewHolder(@NonNull final PathImageAdapter.ViewHolder holder, final int position) {
-        holder.dateTitle.setText(paths.get(position).getDate() + "    "+ paths.get(position).getTitle());
-//        List<Image> images = imageViewModel.findImagesByPathId(paths.get(position).getPath_id());
-//        pathDetailAdapter = new PathDetailAdapter(images);
-//        linearLayoutManager = new LinearLayoutManager(context);
-//        holder.recyclerView.setLayoutManager(linearLayoutManager);
-//        holder.recyclerView.setAdapter(pathDetailAdapter);
-//        holder.recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL));
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        holder.dateTitle.setText(format.format(paths.get(position).getDate()) + "    "+ paths.get(position).getTitle());
         imageViewModel.findImagesByPathId(paths.get(position).getPath_id()).observe(lifecycleOwner, new Observer<List<Image>>() {
             @Override
             public void onChanged(List<Image> images) {
-                pathDetailAdapter = new PathDetailAdapter(images);
+                pathDetailAdapter = new PathDetailAdapter(images, true);
                 int numberOfColumns = 4;
                 holder.recyclerView.setLayoutManager(new GridLayoutManager(context, numberOfColumns));
                 holder.recyclerView.setAdapter(pathDetailAdapter);

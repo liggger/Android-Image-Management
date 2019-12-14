@@ -9,13 +9,13 @@ import java.util.List;
 
 import uk.ac.shef.oak.com4510.model.Image;
 import uk.ac.shef.oak.com4510.model.ImageDao;
-import uk.ac.shef.oak.com4510.model.ImageDatabase;
+import uk.ac.shef.oak.com4510.model.ImagePathDatabase;
 
 public class ImageRepository {
     private ImageDao imageDao;
 
     public ImageRepository(Context context) {
-        ImageDatabase imageDatabase = ImageDatabase.getDatabase(context.getApplicationContext());
+        ImagePathDatabase imageDatabase = ImagePathDatabase.getDatabase(context.getApplicationContext());
         imageDao = imageDatabase.getImageDao();
     }
 

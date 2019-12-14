@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,18 +49,20 @@ public class HomeFragment extends Fragment {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                NavController controller = Navigation.findNavController(v);
-//                controller.navigate(R.id.action_navigation_home_to_homeStopFragment);
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 try {
                     date = sdf.parse(sdf.format(calendar.getInstance().getTime()));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Path path = new Path(title.getText().toString(), date, null, null);
-                insertPath(pathViewModel, path);
-                Intent intent = new Intent(getActivity(), HomeStopActivity.class);
-                startActivity(intent);
+                if (title.getText().toString().trim().equalsIgnoreCase("")) {
+                    title.setError("This field can not be blank");
+                } else {
+                    Path path = new Path(title.getText().toString(), date, null, null);
+                    insertPath(pathViewModel, path);
+                    Intent intent = new Intent(getActivity(), HomeStopActivity.class);
+                    startActivity(intent);
+                }
             }
         });
     }

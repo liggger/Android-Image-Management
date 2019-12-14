@@ -62,18 +62,16 @@ public class PathAdapter extends RecyclerView.Adapter<PathAdapter.ViewHolder>  {
                 controller.navigate(R.id.action_navigation_paths_to_pathDetailFragment, bundle);
             }
         });
-        holder.date.setText(format.format(paths.get(position).getDate()));
-        holder.pathTitle.setText(paths.get(position).getTitle());
+        holder.date.setText(format.format(paths.get(position).getDate()) + "   " + paths.get(position).getTitle());
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView date;
-        public TextView pathTitle;
 
         public ViewHolder(View itemView) {
             super(itemView);
             date = itemView.findViewById(R.id.Date);
-            pathTitle = itemView.findViewById(R.id.pathTitle);
+
         }
     }
 }

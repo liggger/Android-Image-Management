@@ -20,9 +20,11 @@ import uk.ac.shef.oak.com4510.model.Image;
 
 public class PathDetailAdapter extends RecyclerView.Adapter<PathDetailAdapter.ViewHolder> {
     private List<Image> images;
+    private boolean pathImage;
 
-    public PathDetailAdapter(List<Image> images) {
+    public PathDetailAdapter(List<Image> images, boolean pathImage) {
         this.images = images;
+        this.pathImage = pathImage;
     }
 
     @Override
@@ -50,7 +52,11 @@ public class PathDetailAdapter extends RecyclerView.Adapter<PathDetailAdapter.Vi
                 bundle.putInt("path_id", images.get(position).getPath_id());
                 bundle.putInt("image_id", images.get(position).getImage_id());
                 NavController controller = Navigation.findNavController(v);
-                controller.navigate(R.id.action_pathDetailFragment_to_imageFragment, bundle);
+                if (pathImage) {
+                    controller.navigate(R.id.action_pathImageFragment_to_imageFragment, bundle);
+                } else {
+                    controller.navigate(R.id.action_pathDetailFragment_to_imageFragment, bundle);
+                }
             }
         });
     }

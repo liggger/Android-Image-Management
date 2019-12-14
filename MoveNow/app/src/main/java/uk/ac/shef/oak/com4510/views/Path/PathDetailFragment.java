@@ -54,10 +54,9 @@ public class PathDetailFragment extends Fragment {
             @Override
             public void onChanged(List<Image> images) {
                 if (images != null) {
-                    System.out.println(images.size());
-                    pathDetailAdapter = new PathDetailAdapter(images);
+                    pathDetailAdapter = new PathDetailAdapter(images, false);
                     recyclerView = v.findViewById(R.id.recycler_view);
-                    int numberOfColumns = 4;
+                    int numberOfColumns = 3;
                     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), numberOfColumns));
                     recyclerView.setAdapter(pathDetailAdapter);
                     recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));

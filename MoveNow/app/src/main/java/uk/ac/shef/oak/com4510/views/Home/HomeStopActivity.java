@@ -168,7 +168,16 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopLocationUpdates();
+                if (stop.getText().toString().equals("Stop")) {
+                    stopLocationUpdates();
+                    chronometer.stop();
+                    stop.setText("Start");
+                } else {
+                    startLocationUpdates();
+                    chronometer.start();
+                    stop.setText("Stop");
+                }
+
             }
         });
     }

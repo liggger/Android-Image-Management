@@ -4,12 +4,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 
-import uk.ac.shef.oak.com4510.model.Image;
-import uk.ac.shef.oak.com4510.model.ImageDatabase;
+import uk.ac.shef.oak.com4510.model.ImagePathDatabase;
 import uk.ac.shef.oak.com4510.model.Path;
 import uk.ac.shef.oak.com4510.model.PathDao;
 
@@ -17,7 +15,7 @@ public class PathRepository {
     private PathDao pathDao;
 
     public PathRepository(Context context) {
-        ImageDatabase imageDatabase = ImageDatabase.getDatabase(context.getApplicationContext());
+        ImagePathDatabase imageDatabase = ImagePathDatabase.getDatabase(context.getApplicationContext());
         pathDao = imageDatabase.getPathDao();
     }
 

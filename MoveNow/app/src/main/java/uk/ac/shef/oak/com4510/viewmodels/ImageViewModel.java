@@ -24,7 +24,6 @@ public class ImageViewModel extends AndroidViewModel {
         int path_id;
         imageRepository = new ImageRepository(application);
         imageToDisplay = imageRepository.getOneImage();
-        images = imageRepository.getImages();
     }
 
     public LiveData<Image> getImageToDisplay() {
@@ -34,11 +33,8 @@ public class ImageViewModel extends AndroidViewModel {
         return imageToDisplay;
     }
 
-    public LiveData<Image> getImages() {
-        if (images == null) {
-            images = new MutableLiveData<Image>();
-        }
-        return images;
+    public LiveData<List<Image>> getImages() {
+        return imageRepository.getImages();
     }
 
     public void insertOneImage(Image image) {
@@ -47,5 +43,17 @@ public class ImageViewModel extends AndroidViewModel {
 
     public LiveData<List<Image>> findImagesById(int path_id) {
         return imageRepository.findImagesByPath(path_id);
+    }
+
+//    public List<Image> findImagesByPathId(int path_id) {
+//        return imageRepository.findImagesByPathId(path_id);
+//    }
+
+    public LiveData<List<Image>> findImagesByPathId(int path_id) {
+        return imageRepository.findImagesByPathId(path_id);
+    }
+
+        public LiveData<Image> findImageByImageId(int image_id) {
+        return imageRepository.findImageByImageId(image_id);
     }
 }

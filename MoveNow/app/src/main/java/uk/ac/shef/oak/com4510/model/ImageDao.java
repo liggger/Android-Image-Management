@@ -16,8 +16,18 @@ public interface ImageDao {
     LiveData<Image> getOneImage();
 
     @Query("SELECT * FROM Image ORDER BY time")
-    LiveData<Image> getImages();
+    LiveData<List<Image>> getImages();
 
     @Query("SELECT * FROM Image WHERE path_id = :path_id")
     LiveData<List<Image>> findImagesByPath(int path_id);
+
+//    @Query("SELECT * FROM Image WHERE path_id = :path_id")
+//    List<Image> findImagesByPathId(int path_id);
+
+    @Query("SELECT * FROM Image WHERE path_id = :path_id")
+    LiveData<List<Image>> findImagesByPathId(int path_id);
+
+    @Query("SELECT * FROM Image WHERE image_id = :image_id")
+    LiveData<Image> findImageByImageId(int image_id);
+
 }

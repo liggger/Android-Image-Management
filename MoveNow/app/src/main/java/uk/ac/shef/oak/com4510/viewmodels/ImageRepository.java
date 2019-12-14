@@ -27,12 +27,24 @@ public class ImageRepository {
         return imageDao.getOneImage();
     }
 
-    public LiveData<Image> getImages() {
+    public LiveData<List<Image>> getImages() {
         return imageDao.getImages();
     }
 
     public LiveData<List<Image>> findImagesByPath(int path_id) {
         return imageDao.findImagesByPath(path_id);
+    }
+
+//    public List<Image> findImagesByPathId(int path_id) {
+//        return imageDao.findImagesByPathId(path_id);
+//    }
+
+    public LiveData<List<Image>> findImagesByPathId(int path_id) {
+        return imageDao.findImagesByPathId(path_id);
+    }
+
+    public LiveData<Image> findImageByImageId(int image_id) {
+        return imageDao.findImageByImageId(image_id);
     }
 
     private static class InsertAsyncTask extends AsyncTask<Image, Void, Void> {

@@ -14,6 +14,6 @@
     <item
         android:id="@+id/navigation_detail"
         android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/title_detail" />
+        android:title="@string/title_gallery" />
 
 </menu>

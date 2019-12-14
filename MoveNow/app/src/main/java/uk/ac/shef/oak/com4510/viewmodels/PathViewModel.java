@@ -33,6 +33,10 @@ public class PathViewModel extends AndroidViewModel {
         return path;
     }
 
+    public LiveData<Path> findPathById(int path_id) {
+        return pathRepository.findPathById(path_id);
+    }
+
     public void insertPath(Path path) {
         pathRepository.insertPath(path);
     }

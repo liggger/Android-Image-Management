@@ -20,6 +20,9 @@ public interface PathDao {
     @Query("SELECT * FROM path ORDER BY path_id DESC LIMIT 1")
     LiveData<Path> getOnePath();
 
+    @Query("SELECT * FROM path WHERE path_id = :path_id")
+    LiveData<Path> findPathById(int path_id);
+
     @Update
     void updatePath(Path path);
 }

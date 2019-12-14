@@ -4,70 +4,86 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 import uk.ac.shef.oak.com4510.R;
-import uk.ac.shef.oak.com4510.model.ImageElement;
 
-public class PathImageAdapter extends RecyclerView.Adapter<PathImageAdapter.View_Holder> {
-    static private Context context;
-    private static List<ImageElement> items;
+import uk.ac.shef.oak.com4510.model.Image;
+import uk.ac.shef.oak.com4510.model.Path;
+import uk.ac.shef.oak.com4510.viewmodels.ImageViewModel;
 
-    public PathImageAdapter(List<ImageElement> items) {
-        this.items = items;
-    }
+public class PathImageAdapter extends RecyclerView.Adapter<PathImageAdapter.ViewHolder> {
+    private List<Path> paths;
+    private ImageViewModel imageViewModel;
+    private PathDetailAdapter pathDetailAdapter;
+    private LinearLayoutManager linearLayoutManager;
+    private Context context;
+    private LifecycleOwner lifecycleOwner;
 
-    public PathImageAdapter(Context cont, List<ImageElement> items) {
-        super();
-        this.items = items;
-        context = cont;
-    }
-
-    @Override
-    public View_Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        //Inflate the layout, initialize the View Holder
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_path_image,
-                parent, false);
-        View_Holder holder = new View_Holder(v);
-        context= parent.getContext();
-        return holder;
-    }
-
-    @Override
-    public void onBindViewHolder(final View_Holder holder, final int position) {
-
-        //Use the provided View Holder on the onCreateViewHolder method to populate the
-        // current row on the RecyclerView
-        if (holder!=null && items.get(position)!=null) {
-            if (items.get(position).getImage()!=-1) {
-                holder.imageView.setImageResource(items.get(position).getImage());
-            }
-//            holder.itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Intent intent = new Intent(context, ShowImageActivity.class);
-//                    intent.putExtra("position", position);
-//                    context.startActivity(intent);
-//                }
-//            });
-        }
+    public PathImageAdapter(Context context, List<Path> paths, ImageViewModel imageViewModel, LifecycleOwner lifecycleOwner) {
+        this.paths = paths;
+        this.context = context;
+        this.imageViewModel = imageViewModel;
+        this.lifecycleOwner = lifecycleOwner;
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return paths.size();
     }
 
-    public class View_Holder extends RecyclerView.ViewHolder  {
-        ImageView imageView;
+    //创建ViewHolder
+    @NonNull
+    @Override
+    public PathImageAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_path_image, parent, false);
+        ViewHolder holder = new ViewHolder(v);
+        return holder;
+    }
 
-        View_Holder(View itemView) {
+    //填充视图
+    @Override
+    public void onBindViewHolder(@NonNull final PathImageAdapter.ViewHolder holder, final int position) {
+        holder.dateTitle.setText(paths.get(position).getDate() + "    "+ paths.get(position).getTitle());
+//        List<Image> images = imageViewModel.findImagesByPathId(paths.get(position).getPath_id());
+//        pathDetailAdapter = new PathDetailAdapter(images);
+//        linearLayoutManager = new LinearLayoutManager(context);
+//        holder.recyclerView.setLayoutManager(linearLayoutManager);
+//        holder.recyclerView.setAdapter(pathDetailAdapter);
+//        holder.recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL));
+        imageViewModel.findImagesByPathId(paths.get(position).getPath_id()).observe(lifecycleOwner, new Observer<List<Image>>() {
+            @Override
+            public void onChanged(List<Image> images) {
+                pathDetailAdapter = new PathDetailAdapter(images);
+                int numberOfColumns = 4;
+                holder.recyclerView.setLayoutManager(new GridLayoutManager(context, numberOfColumns));
+                holder.recyclerView.setAdapter(pathDetailAdapter);
+                holder.recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
+            }
+        });
+
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder  {
+        TextView dateTitle;
+        RecyclerView recyclerView;
+
+        ViewHolder(View itemView) {
             super(itemView);
-            imageView = (ImageView) itemView.findViewById(R.id.imageView);
+
+            dateTitle = (TextView) itemView.findViewById(R.id.DateTitle);
+            recyclerView = (RecyclerView) itemView.findViewById(R.id.recycler_view);
         }
 
     }

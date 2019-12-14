@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 
+import uk.ac.shef.oak.com4510.model.Image;
 import uk.ac.shef.oak.com4510.model.ImageDatabase;
 import uk.ac.shef.oak.com4510.model.Path;
 import uk.ac.shef.oak.com4510.model.PathDao;
@@ -30,6 +31,10 @@ public class PathRepository {
 
     public LiveData<Path> getOnePath() {
         return pathDao.getOnePath();
+    }
+
+    public LiveData<Path> findPathById(int path_id) {
+        return pathDao.findPathById(path_id);
     }
 
     public void updatePath(Path path) {

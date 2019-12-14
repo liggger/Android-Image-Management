@@ -18,18 +18,21 @@
     <fragment
         android:id="@+id/navigation_paths"
         android:name="uk.ac.shef.oak.com4510.views.Path.PathFragment"
-        android:label="@string/title_detail"
+        android:label="@string/title_paths"
         tools:layout="@layout/fragment_path" >
         <action
             android:id="@+id/action_navigation_paths_to_pathDetailFragment"
             app:destination="@id/pathDetailFragment" />
+        <action
+            android:id="@+id/action_navigation_paths_to_pathImageFragment"
+            app:destination="@id/pathImageFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_detail"
-        android:name="uk.ac.shef.oak.com4510.views.Detail.DetailFragment"
-        android:label="@string/title_paths"
-        tools:layout="@layout/fragment_detail" />
+        android:name="uk.ac.shef.oak.com4510.views.Gallery.GalleryFragment"
+        android:label="@string/title_gallery"
+        tools:layout="@layout/fragment_gallery" />
 
     <fragment
         android:id="@+id/homeStopFragment"
@@ -49,5 +52,14 @@
         android:id="@+id/pathDetailFragment"
         android:name="uk.ac.shef.oak.com4510.views.Path.PathDetailFragment"
         android:label="fragment_path_detail"
-        tools:layout="@layout/fragment_path_detail" />
+        tools:layout="@layout/fragment_path_detail" >
+        <action
+            android:id="@+id/action_pathDetailFragment_to_imageFragment"
+            app:destination="@id/imageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/imageFragment"
+        android:name="uk.ac.shef.oak.com4510.views.Path.ImageFragment"
+        android:label="fragment_image"
+        tools:layout="@layout/fragment_image" />
 </navigation>

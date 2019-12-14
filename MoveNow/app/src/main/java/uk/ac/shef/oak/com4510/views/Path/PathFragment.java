@@ -71,14 +71,14 @@ public class PathFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        ImageView imageView = getView().findViewById(R.id.imageView);
-//        imageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                NavController controller = Navigation.findNavController(v);
-//                controller.navigate(R.id.action_navigation_paths_to_pathImageFragment);
-//            }
-//        });
+        ImageView imageView = getView().findViewById(R.id.imageView);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavController controller = Navigation.findNavController(v);
+                controller.navigate(R.id.action_navigation_paths_to_pathImageFragment);
+            }
+        });
     }
 
 }

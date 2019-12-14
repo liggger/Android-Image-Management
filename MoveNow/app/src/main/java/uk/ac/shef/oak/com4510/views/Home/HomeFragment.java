@@ -58,7 +58,6 @@ public class HomeFragment extends Fragment {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                System.out.println("!!!!" + title.getText().toString());
                 Path path = new Path(title.getText().toString(), date, null, null);
                 insertPath(pathViewModel, path);
                 Intent intent = new Intent(getActivity(), HomeStopActivity.class);

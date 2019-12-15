@@ -139,12 +139,21 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
 
+        FloatingActionButton fabGallery = findViewById(R.id.fab_gallery);
+        fabGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EasyImage.openGallery(getActivity(), 0);
+            }
+        });
+
         FloatingActionButton fab = findViewById(R.id.fab_camera);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
-                        .title(mLastUpdateTime));
+                mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation
+                                .getLongitude()))
+                                .title(mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude()));
 
                 pressure = pressure_and_temperature.getPressure();
                 temperature = pressure_and_temperature.getTemperature();
@@ -154,11 +163,8 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                image = new Image(pathId, mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), date, pressure, temperature);
+                image = new Image(pathId, mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), date);
 
-                imagePath.setLatitudeList(currentLatitudeList);
-                imagePath.setLongitudeList(currentLongitudeList);
-                pathViewModel.updatePath(imagePath);
 
                 EasyImage.openCamera(getActivity(), 0);
             }
@@ -230,8 +236,18 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
                 currentLongitudeList.add(mCurrentLocation.getLongitude());
                 route.add(new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude()));
             }
+            pressure = pressure_and_temperature.getPressure();
+            temperature = pressure_and_temperature.getTemperature();
+
+            imagePath.setLatitudeList(currentLatitudeList);
+            imagePath.setLongitudeList(currentLongitudeList);
+            imagePath.setPressure(pressure);
+            imagePath.setTemperature(temperature);
+            pathViewModel.updatePath(imagePath);
+
             polyline = mMap.addPolyline(new PolylineOptions().addAll(route).width(10).color(Color.BLUE));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), 14.0f));
+
         }
     };
 
@@ -281,8 +297,7 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             public void onImagesPicked(List<File> imageFiles, EasyImage.ImageSource source, int type) {
                 System.out.println(imageFiles.get(0).getAbsolutePath());
                 Bitmap bitmap= BitmapFactory.decodeFile(imageFiles.get(0).getAbsolutePath());
-                Bitmap scaleBitmap = scaleBitmap(bitmap, 0.25f);
-                byte[] picture = getBitmapAsByteArray(scaleBitmap);
+                byte[] picture = getBitmapAsByteArray(bitmap);
                 image.setPicture(picture);
 
                 insertImage(imageViewModel);
@@ -323,19 +338,4 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         return activity;
     }
 
-    private Bitmap scaleBitmap(Bitmap origin, float ratio) {
-        if (origin == null) {
-            return null;
-        }
-        int width = origin.getWidth();
-        int height = origin.getHeight();
-        Matrix matrix = new Matrix();
-        matrix.preScale(ratio, ratio);
-        Bitmap newBM = Bitmap.createBitmap(origin, 0, 0, width, height, matrix, false);
-        if (newBM.equals(origin)) {
-            return newBM;
-        }
-        origin.recycle();
-        return newBM;
-    }
 }

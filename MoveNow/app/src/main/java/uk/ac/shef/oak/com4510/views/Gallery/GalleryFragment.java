@@ -41,7 +41,7 @@ public class GalleryFragment extends Fragment {
                     int numberOfColumns = 4;
                     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), numberOfColumns));
                     recyclerView.setAdapter(galleryAdapter);
-                    recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+//                    recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
                 }
             }
         });

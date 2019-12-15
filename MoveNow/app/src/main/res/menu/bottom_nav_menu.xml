@@ -8,12 +8,17 @@
 
     <item
         android:id="@+id/navigation_paths"
-        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:icon="@drawable/paths"
         android:title="@string/title_paths" />
 
     <item
-        android:id="@+id/navigation_detail"
-        android:icon="@drawable/ic_notifications_black_24dp"
+        android:id="@+id/navigation_gallery"
+        android:icon="@drawable/gallery"
         android:title="@string/title_gallery" />
+
+    <item
+        android:id="@+id/navigation_user"
+        android:icon="@drawable/user"
+        android:title="@string/title_user" />
 
 </menu>

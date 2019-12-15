@@ -4,6 +4,7 @@ package uk.ac.shef.oak.com4510.views.Path;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -78,9 +79,13 @@ public class ImageFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onChanged(Path path) {
                 if (path != null) {
+                    temperature = path.getTemperature();
+                    pressure = path.getPressure();
+                    Temp.setText("Temp: " + temperature);
+                    Pressure.setText("Pressure: " + pressure);
+                    Title.setText("Title: " + path.getTitle());
                     latitudeList = path.getLatitudeList();
                     longitudeList = path.getLongitudeList();
-                    Title.setText("Title: " + path.getTitle());
                     plotRoute(mMap, latitudeList, longitudeList);
                 }
             }
@@ -120,18 +125,14 @@ public class ImageFragment extends Fragment implements OnMapReadyCallback {
                     mMap.addMarker(new MarkerOptions().position(latLng)
                             .title(image.getLatitude() + ", " + image.getLongitude())
                             .icon(smallMarkerIcon));
-                    temperature = image.getTemperature();
-                    pressure = image.getPressure();
-                    Temp.setText("Temp: " + temperature);
-                    Pressure.setText("Pressure: " + pressure);
                     byte[] picture = image.getPicture();
                     Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+                    bitmap = scaleBitmap(bitmap, 0.4f);
                     imageView.setImageBitmap(bitmap);
                 }
             }
         });
 
-        System.out.println("tttttttt" + imageLatitude);
         return v;
     }
 
@@ -156,5 +157,21 @@ public class ImageFragment extends Fragment implements OnMapReadyCallback {
         }
         map.addPolyline(new PolylineOptions().addAll(route).width(6).color(Color.BLUE));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.get(0), 14.0f));
+    }
+
+    private Bitmap scaleBitmap(Bitmap origin, float ratio) {
+        if (origin == null) {
+            return null;
+        }
+        int width = origin.getWidth();
+        int height = origin.getHeight();
+        Matrix matrix = new Matrix();
+        matrix.preScale(1, ratio);
+        Bitmap newBM = Bitmap.createBitmap(origin, 0, 0, width, height, matrix, false);
+        if (newBM.equals(origin)) {
+            return newBM;
+        }
+        origin.recycle();
+        return newBM;
     }
 }

@@ -58,7 +58,7 @@ public class HomeFragment extends Fragment {
                 if (title.getText().toString().trim().equalsIgnoreCase("")) {
                     title.setError("This field can not be blank");
                 } else {
-                    Path path = new Path(title.getText().toString(), date, null, null);
+                    Path path = new Path(title.getText().toString(), date, null,null, null, null);
                     insertPath(pathViewModel, path);
                     Intent intent = new Intent(getActivity(), HomeStopActivity.class);
                     startActivity(intent);

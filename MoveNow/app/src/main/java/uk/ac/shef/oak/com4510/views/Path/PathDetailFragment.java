@@ -56,10 +56,10 @@ public class PathDetailFragment extends Fragment {
                 if (images != null) {
                     pathDetailAdapter = new PathDetailAdapter(images, false);
                     recyclerView = v.findViewById(R.id.recycler_view);
-                    int numberOfColumns = 3;
+                    int numberOfColumns = 4;
                     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), numberOfColumns));
                     recyclerView.setAdapter(pathDetailAdapter);
-                    recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+//                    recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
                 }
             }
         });

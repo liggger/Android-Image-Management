@@ -32,22 +32,14 @@ public class Image {
     @ColumnInfo(name = "time")
     private Date time;
 
-    @ColumnInfo(name = "pressure")
-    private String pressure;
-
-    @ColumnInfo(name = "temperature")
-    private String temperature;
-
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     private byte[] picture;
 
-    public Image(int path_id, double latitude, double longitude, Date time, String pressure, String temperature) {
+    public Image(int path_id, double latitude, double longitude, Date time) {
         this.path_id = path_id;
         this.latitude = latitude;
         this.longitude = longitude;
         this.time = time;
-        this.pressure = pressure;
-        this.temperature = temperature;
     }
 
     public int getImage_id() {
@@ -98,19 +90,4 @@ public class Image {
         this.time = time;
     }
 
-    public String getPressure() {
-        return pressure;
-    }
-
-    public void setPressure(String pressure) {
-        this.pressure = pressure;
-    }
-
-    public String getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(String temperature) {
-        this.temperature = temperature;
-    }
 }

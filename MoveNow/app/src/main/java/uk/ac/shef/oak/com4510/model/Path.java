@@ -22,15 +22,23 @@ public class Path {
     @ColumnInfo(name = "date")
     private Date date;
 
+    @ColumnInfo(name = "pressure")
+    private String pressure;
+
+    @ColumnInfo(name = "temperature")
+    private String temperature;
+
     @ColumnInfo(name = "latitude_list")
     private List<Double> latitudeList;
 
     @ColumnInfo(name = "longitude_list")
     private List<Double> longitudeList;
 
-    public Path(String title, Date date, List<Double> latitudeList, List<Double> longitudeList) {
+    public Path(String title, Date date, String pressure, String temperature, List<Double> latitudeList, List<Double> longitudeList) {
         this.title = title;
         this.date = date;
+        this.pressure = pressure;
+        this.temperature = temperature;
         this.latitudeList = latitudeList;
         this.longitudeList = longitudeList;
     }
@@ -73,5 +81,21 @@ public class Path {
 
     public void setLongitudeList(List<Double> longitudeList) {
         this.longitudeList = longitudeList;
+    }
+
+    public String getPressure() {
+        return pressure;
+    }
+
+    public void setPressure(String pressure) {
+        this.pressure = pressure;
+    }
+
+    public String getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(String temperature) {
+        this.temperature = temperature;
     }
 }

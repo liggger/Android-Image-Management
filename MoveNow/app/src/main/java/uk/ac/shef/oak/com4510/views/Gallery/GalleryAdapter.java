@@ -2,6 +2,7 @@ package uk.ac.shef.oak.com4510.views.Gallery;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,17 +44,18 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     public void onBindViewHolder(@NonNull final GalleryAdapter.ViewHolder holder, final int position) {
         byte[] picture = images.get(position).getPicture();
         Bitmap image = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+        image = scaleBitmap(image, 0.25f);
         holder.image.setImageBitmap(image);
-//        holder.itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Bundle bundle = new Bundle();
-//                bundle.putInt("path_id", images.get(position).getPath_id());
-//                bundle.putInt("image_id", images.get(position).getImage_id());
-//                NavController controller = Navigation.findNavController(v);
-//                controller.navigate(R.id.action_pathDetailFragment_to_imageFragment, bundle);
-//            }
-//        });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putInt("path_id", images.get(position).getPath_id());
+                bundle.putInt("image_id", images.get(position).getImage_id());
+                NavController controller = Navigation.findNavController(v);
+                controller.navigate(R.id.action_navigation_gallery_to_imageFragment, bundle);
+            }
+        });
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -63,5 +65,21 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             super(itemView);
             image = itemView.findViewById(R.id.Image);
         }
+    }
+
+    private Bitmap scaleBitmap(Bitmap origin, float ratio) {
+        if (origin == null) {
+            return null;
+        }
+        int width = origin.getWidth();
+        int height = origin.getHeight();
+        Matrix matrix = new Matrix();
+        matrix.preScale(ratio, ratio);
+        Bitmap newBM = Bitmap.createBitmap(origin, 0, 0, width, height, matrix, false);
+        if (newBM.equals(origin)) {
+            return newBM;
+        }
+        origin.recycle();
+        return newBM;
     }
 }

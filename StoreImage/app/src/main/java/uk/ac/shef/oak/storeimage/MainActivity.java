@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -31,8 +32,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
 
+import pl.aprilapps.easyphotopicker.ChooserType;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
+import pl.aprilapps.easyphotopicker.MediaFile;
+import pl.aprilapps.easyphotopicker.MediaSource;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private int REQUEST_CODE_PERMISSIONS = 101;
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
     private Activity activity;
+    private EasyImage easyImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,19 +63,21 @@ public class MainActivity extends AppCompatActivity {
 
         System.out.println(allPermissionsGranted());
         if(allPermissionsGranted()){
-            initEasyImage(); //start camera if permission has been granted by user
+
+            initEasyImage();
             System.out.println("yes");
         } else{
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
 
-        initEasyImage();
+//        initEasyImage();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_camera);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EasyImage.openCamera(getActivity(), 0);
+//                EasyImage.openCamera(getActivity(), 0);
+                easyImage.openCameraForImage(MainActivity.this);
             }
         });
     }
@@ -105,29 +112,35 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initEasyImage() {
-        EasyImage.configuration(this)
-                .setImagesFolderName("EasyImage sample")
-                .setCopyTakenPhotosToPublicGalleryAppFolder(true)
-                .setCopyPickedImagesToPublicGalleryAppFolder(false)
-                .setAllowMultiplePickInGallery(true);
+        easyImage = new EasyImage.Builder(this)
+                .setChooserTitle("Pick media")
+                .setCopyImagesToPublicGalleryFolder(false)
+//                .setChooserType(ChooserType.CAMERA_AND_DOCUMENTS)
+                .setChooserType(ChooserType.CAMERA_AND_GALLERY)
+                .setFolderName("EasyImage sample")
+                .allowMultiple(true)
+                .build();
     }
+
+//    private void initEasyImage() {
+//        EasyImage.configuration(this)
+//                .setImagesFolderName("EasyImage sample")
+//                .setCopyTakenPhotosToPublicGalleryAppFolder(true)
+//                .setCopyPickedImagesToPublicGalleryAppFolder(false)
+//                .setAllowMultiplePickInGallery(true);
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
+        easyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
             @Override
-            public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
-                //Some error handling
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onImagesPicked(List<File> imageFiles, EasyImage.ImageSource source, int type) {
-                System.out.println(imageFiles.size());
-                System.out.println(imageFiles);
-                Bitmap bitmap= BitmapFactory.decodeFile(imageFiles.get(0).getAbsolutePath());
+            public void onMediaFilesPicked(MediaFile[] imageFiles, MediaSource source) {
+                for (MediaFile imageFile : imageFiles) {
+                    Log.d("EasyImage", "Image file returned: " + imageFile.getFile().toString());
+                }
+                Bitmap bitmap= BitmapFactory.decodeFile(imageFiles[0].getFile().getAbsolutePath());
                 Bitmap scaleBitmap = scaleBitmap(bitmap, 0.25f);
                 imageView.setImageBitmap(scaleBitmap);
                 byte[] a = getBitmapAsByteArray(bitmap);
@@ -135,14 +148,44 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCanceled(EasyImage.ImageSource source, int type) {
-                //Cancel handling, you might wanna remove taken photo if it was canceled
-                if (source == EasyImage.ImageSource.CAMERA) {
-                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(getActivity());
-                    if (photoFile != null) photoFile.delete();
-                }
+            public void onImagePickerError(@NonNull Throwable error, @NonNull MediaSource source) {
+                //Some error handling
+                error.printStackTrace();
+            }
+
+            @Override
+            public void onCanceled(@NonNull MediaSource source) {
+                //Not necessary to remove any files manually anymore
             }
         });
+
+//        EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
+//            @Override
+//            public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
+//                //Some error handling
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onImagesPicked(List<File> imageFiles, EasyImage.ImageSource source, int type) {
+//                System.out.println(imageFiles.size());
+//                System.out.println(imageFiles);
+//                Bitmap bitmap= BitmapFactory.decodeFile(imageFiles.get(0).getAbsolutePath());
+//                Bitmap scaleBitmap = scaleBitmap(bitmap, 0.25f);
+//                imageView.setImageBitmap(scaleBitmap);
+//                byte[] a = getBitmapAsByteArray(bitmap);
+////                insertImage(imageViewModel, a);
+//            }
+//
+//            @Override
+//            public void onCanceled(EasyImage.ImageSource source, int type) {
+//                //Cancel handling, you might wanna remove taken photo if it was canceled
+//                if (source == EasyImage.ImageSource.CAMERA) {
+//                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(getActivity());
+//                    if (photoFile != null) photoFile.delete();
+//                }
+//            }
+//        });
     }
 
     @Override
@@ -150,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
 
         if(requestCode == REQUEST_CODE_PERMISSIONS){
             if(allPermissionsGranted()){
-                initEasyImage();
             } else{
                 Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
                 finish();

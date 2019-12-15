@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -50,8 +51,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import pl.aprilapps.easyphotopicker.ChooserType;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
+import pl.aprilapps.easyphotopicker.MediaFile;
+import pl.aprilapps.easyphotopicker.MediaSource;
 import uk.ac.shef.oak.com4510.R;
 import uk.ac.shef.oak.com4510.model.Image;
 import uk.ac.shef.oak.com4510.model.Path;
@@ -63,6 +67,7 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
     private static final int REQUEST_CODE_PERMISSIONS = 101;
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
 
+    private EasyImage easyImage;
     private ImageViewModel imageViewModel;
     private PathViewModel pathViewModel;
 
@@ -116,15 +121,13 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         chronometer = (Chronometer) findViewById(R.id.chronometer);
         sdf = new SimpleDateFormat("HH:mm:ss");
         chronometer.setFormat("00:%s");
-        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener()
-        {
+        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
             @Override
-            public void onChronometerTick(Chronometer ch)
-            {
-                long elapsedMillis = SystemClock.elapsedRealtime() -chronometer.getBase();
-                if(elapsedMillis > 3600000L){
+            public void onChronometerTick(Chronometer ch) {
+                long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
+                if (elapsedMillis > 3600000L) {
                     chronometer.setFormat("0%s");
-                }else{
+                } else {
                     chronometer.setFormat("00:%s");
 
                 }
@@ -132,10 +135,10 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         });
         chronometer.start();
 
-        if(allPermissionsGranted()){
+        if (allPermissionsGranted()) {
             initEasyImage(); //start camera if permission has been granted by user
             startLocationUpdates();
-        } else{
+        } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
 
@@ -143,7 +146,7 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         fabGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EasyImage.openGallery(getActivity(), 0);
+                easyImage.openGallery(getActivity());
             }
         });
 
@@ -152,8 +155,8 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onClick(View view) {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation
-                                .getLongitude()))
-                                .title(mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude()));
+                        .getLongitude()))
+                        .title(mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude()));
 
                 pressure = pressure_and_temperature.getPressure();
                 temperature = pressure_and_temperature.getTemperature();
@@ -166,7 +169,8 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
                 image = new Image(pathId, mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), date);
 
 
-                EasyImage.openCamera(getActivity(), 0);
+//                EasyImage.openCamera(getActivity(), 0);
+                easyImage.openCameraForImage(getActivity());
             }
         });
 
@@ -220,7 +224,7 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
     /**
      * it stops the location updates
      */
-    private void stopLocationUpdates(){
+    private void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
@@ -231,10 +235,10 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             mCurrentLocation = locationResult.getLastLocation();
             mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
             Log.i("MAP", "new location " + mCurrentLocation.toString());
-            if (mMap != null){
+            if (mMap != null) {
                 currentLatitudeList.add(mCurrentLocation.getLatitude());
                 currentLongitudeList.add(mCurrentLocation.getLongitude());
-                route.add(new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude()));
+                route.add(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
             }
             pressure = pressure_and_temperature.getPressure();
             temperature = pressure_and_temperature.getTemperature();
@@ -275,28 +279,35 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     private void initEasyImage() {
-        EasyImage.configuration(this)
-                .setImagesFolderName("EasyImage sample")
-                .setCopyTakenPhotosToPublicGalleryAppFolder(true)
-                .setCopyPickedImagesToPublicGalleryAppFolder(false)
-                .setAllowMultiplePickInGallery(true);
+        easyImage = new EasyImage.Builder(this)
+                .setChooserTitle("Pick media")
+                .setCopyImagesToPublicGalleryFolder(false)
+//                .setChooserType(ChooserType.CAMERA_AND_DOCUMENTS)
+                .setChooserType(ChooserType.CAMERA_AND_GALLERY)
+                .setFolderName("EasyImage sample")
+                .allowMultiple(true)
+                .build();
     }
+
+//    private void initEasyImage() {
+//        EasyImage.configuration(this)
+//                .setImagesFolderName("EasyImage sample")
+//                .setCopyTakenPhotosToPublicGalleryAppFolder(true)
+//                .setCopyPickedImagesToPublicGalleryAppFolder(false)
+//                .setAllowMultiplePickInGallery(true);
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
+        easyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
             @Override
-            public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
-                //Some error handling
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onImagesPicked(List<File> imageFiles, EasyImage.ImageSource source, int type) {
-                System.out.println(imageFiles.get(0).getAbsolutePath());
-                Bitmap bitmap= BitmapFactory.decodeFile(imageFiles.get(0).getAbsolutePath());
+            public void onMediaFilesPicked(MediaFile[] imageFiles, MediaSource source) {
+                for (MediaFile imageFile : imageFiles) {
+                    Log.d("EasyImage", "Image file returned: " + imageFile.getFile().toString());
+                }
+                Bitmap bitmap = BitmapFactory.decodeFile(imageFiles[0].getFile().getAbsolutePath());
                 byte[] picture = getBitmapAsByteArray(bitmap);
                 image.setPicture(picture);
 
@@ -304,38 +315,71 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             }
 
             @Override
-            public void onCanceled(EasyImage.ImageSource source, int type) {
-                //Cancel handling, you might wanna remove taken photo if it was canceled
-                if (source == EasyImage.ImageSource.CAMERA) {
-                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(getActivity());
-                    if (photoFile != null) photoFile.delete();
-                }
+            public void onImagePickerError(@NonNull Throwable error, @NonNull MediaSource source) {
+                //Some error handling
+                error.printStackTrace();
+            }
+
+            @Override
+            public void onCanceled(@NonNull MediaSource source) {
+                //Not necessary to remove any files manually anymore
             }
         });
     }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
+//            @Override
+//            public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
+//                //Some error handling
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onImagesPicked(List<File> imageFiles, EasyImage.ImageSource source, int type) {
+//                System.out.println(imageFiles.get(0).getAbsolutePath());
+//                Bitmap bitmap= BitmapFactory.decodeFile(imageFiles.get(0).getAbsolutePath());
+//                byte[] picture = getBitmapAsByteArray(bitmap);
+//                image.setPicture(picture);
+//
+//                insertImage(imageViewModel);
+//            }
+//
+//            @Override
+//            public void onCanceled(EasyImage.ImageSource source, int type) {
+//                //Cancel handling, you might wanna remove taken photo if it was canceled
+//                if (source == EasyImage.ImageSource.CAMERA) {
+//                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(getActivity());
+//                    if (photoFile != null) photoFile.delete();
+//                }
+//            }
+//        });
+//    }
 
-    public void insertImage(ImageViewModel imageViewModel) {
-        imageViewModel.insertOneImage(image);
-    }
-
-    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-        return outputStream.toByteArray();
-    }
-
-    private boolean allPermissionsGranted(){
-
-        for(String permission : REQUIRED_PERMISSIONS){
-            if(ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
-                return false;
-            }
+        public void insertImage (ImageViewModel imageViewModel){
+            imageViewModel.insertOneImage(image);
         }
-        return true;
-    }
 
-    public Activity getActivity() {
-        return activity;
-    }
+        public static byte[] getBitmapAsByteArray (Bitmap bitmap){
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+            return outputStream.toByteArray();
+        }
 
-}
+        private boolean allPermissionsGranted () {
+
+            for (String permission : REQUIRED_PERMISSIONS) {
+                if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public Activity getActivity () {
+            return activity;
+        }
+
+    }

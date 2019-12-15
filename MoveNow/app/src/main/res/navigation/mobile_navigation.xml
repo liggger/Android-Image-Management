@@ -10,9 +10,6 @@
         android:name="uk.ac.shef.oak.com4510.views.Home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_navigation_home_to_homeStopFragment"
-            app:destination="@id/homeStopFragment" />
     </fragment>
 
     <fragment
@@ -44,15 +41,6 @@
         android:label="@string/title_user"
         tools:layout="@layout/fragment_user" />
 
-    <fragment
-        android:id="@+id/homeStopFragment"
-        android:name="uk.ac.shef.oak.com4510.views.Home.HomeStopFragment"
-        android:label="fragment_home_stop"
-        tools:layout="@layout/fragment_home_stop" >
-        <action
-            android:id="@+id/action_homeStopFragment_to_navigation_home"
-            app:destination="@id/navigation_home" />
-    </fragment>
     <fragment
         android:id="@+id/pathImageFragment"
         android:name="uk.ac.shef.oak.com4510.views.Path.PathImageFragment"

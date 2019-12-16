@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -67,6 +68,8 @@ import uk.ac.shef.oak.com4510.model.Image;
 import uk.ac.shef.oak.com4510.model.Path;
 import uk.ac.shef.oak.com4510.viewmodels.ImageViewModel;
 import uk.ac.shef.oak.com4510.viewmodels.PathViewModel;
+import uk.ac.shef.oak.com4510.views.Home.Service.ProcessMainClass;
+import uk.ac.shef.oak.com4510.views.Home.Service.RestartServiceBroadcastReceiver;
 
 public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int ACCESS_FINE_LOCATION = 123;
@@ -204,34 +207,6 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     private void startLocationUpdates(Context context) {
-//        Intent intent = new Intent(context, HomeStopLocationService.class);
-//        mLocationPendingIntent = PendingIntent.getService(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // Should we show an explanation?
-//            Task<Void> locationTask = mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-//                    mLocationPendingIntent);
-//            if (locationTask != null) {
-//                locationTask.addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        if (e instanceof ApiException) {
-//                            Log.w("MapsActivity", ((ApiException) e).getStatusMessage());
-//                        } else {
-//                            Log.w("MapsActivity", e.getMessage());
-//                        }
-//                    }
-//                });
-//
-//                locationTask.addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        Log.d("MapsActivity", "restarting gps successful!");
-//                    }
-//                });
-//            }
-//
-//            return;
-//        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -252,6 +227,13 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null /* Looper */);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            RestartServiceBroadcastReceiver.scheduleJob(getApplicationContext());
+        } else {
+            ProcessMainClass bck = new ProcessMainClass();
+            bck.launchService(getApplicationContext());
+        }
     }
 
     /**

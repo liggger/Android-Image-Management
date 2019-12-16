@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 
 import java.util.List;
 
@@ -37,16 +39,16 @@ public class ImageViewModel extends AndroidViewModel {
         return imageRepository.getImages();
     }
 
+    public final LiveData<PagedList<Image>> getImagesByDate() {
+        return imageRepository.getImagesByDate();
+    }
+
     public void insertOneImage(Image image) {
         imageRepository.insertOneImage(image);
     }
 
-    public LiveData<List<Image>> findImagesById(int path_id) {
-        return imageRepository.findImagesByPath(path_id);
-    }
-
-//    public List<Image> findImagesByPathId(int path_id) {
-//        return imageRepository.findImagesByPathId(path_id);
+//    public LiveData<List<Image>> findImagesById(int path_id) {
+//        return imageRepository.findImagesByPath(path_id);
 //    }
 
     public LiveData<List<Image>> findImagesByPathId(int path_id) {

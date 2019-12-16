@@ -9,12 +9,12 @@ android {
             keyPassword 'com4510iscool'
         }
     }
-    compileSdkVersion 29
+    compileSdkVersion 28
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "uk.ac.shef.oak.com4510"
         minSdkVersion 18
-        targetSdkVersion 29
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -50,6 +50,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
     implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'android.arch.paging:runtime:1.0.1'
 
     dependencies {
         def room_version = "2.2.1"

@@ -36,7 +36,7 @@ public class Pressure_and_Temperature {
         temperature = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
 
 
-        if (!standardpressuresensorAvaiable() && !standardtemperaturesensorAvaiable()){
+        if (!standardPressureSensorAvailable() && !standardTemperatureSensorAvailable()){
             Log.d(TAG,"Error");
         }
         else {
@@ -74,15 +74,19 @@ public class Pressure_and_Temperature {
 
 
     //pressure
-    private boolean standardpressuresensorAvaiable(){
+    private boolean standardPressureSensorAvailable(){
         return (pressure!=null);
     }
 
-    public void startpressureSensor(){
-        sensorManager.registerListener(pressure_sensorEventListener,pressure,(1000*1000));
+    public void startPressureSensor(){
+        try {
+            sensorManager.registerListener(pressure_sensorEventListener,pressure,(1000*1000));
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
-    public void stoppressureSensor(){
+    public void stopPressureSensor(){
         sensorManager.unregisterListener(pressure_sensorEventListener);
     }
 
@@ -93,15 +97,19 @@ public class Pressure_and_Temperature {
     }
 
     //temperature
-    private boolean standardtemperaturesensorAvaiable(){
+    private boolean standardTemperatureSensorAvailable(){
         return (temperature!=null);
     }
 
-    public void starttemperatureSensor(){
-        sensorManager.registerListener(temperature_sensorEventListener,temperature,(1000*1000));
+    public void startTemperatureSensor(){
+        try {
+            sensorManager.registerListener(temperature_sensorEventListener,temperature,(1000*1000));
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
-    public void stoptemperatureSensor(){
+    public void stopTemperatureSensor(){
         sensorManager.unregisterListener(temperature_sensorEventListener);
     }
 

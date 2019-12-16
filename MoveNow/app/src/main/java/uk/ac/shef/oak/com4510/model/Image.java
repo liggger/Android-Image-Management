@@ -1,5 +1,6 @@
 package uk.ac.shef.oak.com4510.model;
 
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -90,4 +91,8 @@ public class Image {
         this.time = time;
     }
 
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return super.equals(obj);
+    }
 }

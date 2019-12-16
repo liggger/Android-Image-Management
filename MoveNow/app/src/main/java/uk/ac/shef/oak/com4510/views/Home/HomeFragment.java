@@ -24,7 +24,7 @@ import uk.ac.shef.oak.com4510.model.Path;
 import uk.ac.shef.oak.com4510.viewmodels.PathViewModel;
 
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements View.OnFocusChangeListener {
 
     private PathViewModel pathViewModel;
     private EditText title;
@@ -34,8 +34,7 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        pathViewModel =
-                ViewModelProviders.of(this).get(PathViewModel.class);
+        pathViewModel = ViewModelProviders.of(this).get(PathViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         return root;
     }
@@ -45,6 +44,7 @@ public class HomeFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         title = getView().findViewById(R.id.editText);
+        title.setOnFocusChangeListener(this::onFocusChange);
         start = getView().findViewById(R.id.Start);
         start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,8 +63,14 @@ public class HomeFragment extends Fragment {
                     Intent intent = new Intent(getActivity(), HomeStopActivity.class);
                     startActivity(intent);
                 }
+
             }
         });
+    }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        title.setHint("");
     }
 
     public void insertPath(PathViewModel pathViewModel, Path path) {

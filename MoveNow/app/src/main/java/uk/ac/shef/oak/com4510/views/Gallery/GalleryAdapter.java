@@ -12,24 +12,20 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 import uk.ac.shef.oak.com4510.R;
 import uk.ac.shef.oak.com4510.model.Image;
-import uk.ac.shef.oak.com4510.views.Path.PathDetailAdapter;
 
-public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
+public class GalleryAdapter extends PagedListAdapter<Image, GalleryAdapter.ViewHolder> {
     private List<Image> images;
 
-    public GalleryAdapter(List<Image> images) {
-        this.images = images;
-    }
-
-    @Override
-    public int getItemCount() {
-        return images.size();
+    protected GalleryAdapter() {
+        super(DIFF_CALLBACK);
     }
 
     @NonNull
@@ -42,7 +38,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull final GalleryAdapter.ViewHolder holder, final int position) {
-        byte[] picture = images.get(position).getPicture();
+//        byte[] picture = images.get(position).getPicture();
+        byte[] picture = getItem(position).getPicture();
         Bitmap image = BitmapFactory.decodeByteArray(picture, 0, picture.length);
         image = scaleBitmap(image, 0.25f);
         holder.image.setImageBitmap(image);
@@ -50,8 +47,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putInt("path_id", images.get(position).getPath_id());
-                bundle.putInt("image_id", images.get(position).getImage_id());
+                bundle.putInt("path_id", getItem(position).getPath_id());
+                bundle.putInt("image_id", getItem(position).getImage_id());
                 NavController controller = Navigation.findNavController(v);
                 controller.navigate(R.id.action_navigation_gallery_to_imageFragment, bundle);
             }
@@ -66,6 +63,19 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             image = itemView.findViewById(R.id.Image);
         }
     }
+
+    private static DiffUtil.ItemCallback<Image> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<Image>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Image oldItem, @NonNull Image newItem) {
+            return oldItem.getImage_id() == newItem.getImage_id();
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Image oldItem, @NonNull Image newItem) {
+                    return oldItem.equals(newItem);
+        }
+    };
 
     private Bitmap scaleBitmap(Bitmap origin, float ratio) {
         if (origin == null) {

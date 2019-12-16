@@ -18,4 +18,5 @@
     <string name="pathTitle">pathTitle</string>
     <string name="pathToImagePath">pathToImagePath</string>
     <string name="title">Title</string>
+    <string name="User">User</string>
 </resources>

@@ -16,12 +16,6 @@ import uk.ac.shef.oak.com4510.R;
  */
 public class UserFragment extends Fragment {
 
-
-    public UserFragment() {
-        // Required empty public constructor
-    }
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 
 import java.util.List;
 
@@ -31,12 +33,13 @@ public class ImageRepository {
         return imageDao.getImages();
     }
 
-    public LiveData<List<Image>> findImagesByPath(int path_id) {
-        return imageDao.findImagesByPath(path_id);
+    public LiveData<PagedList<Image>> getImagesByDate() {
+        return new LivePagedListBuilder<>(
+                imageDao.getImagesByDate(), 20).build();
     }
 
-//    public List<Image> findImagesByPathId(int path_id) {
-//        return imageDao.findImagesByPathId(path_id);
+//    public LiveData<List<Image>> findImagesByPath(int path_id) {
+//        return imageDao.findImagesByPath(path_id);
 //    }
 
     public LiveData<List<Image>> findImagesByPathId(int path_id) {

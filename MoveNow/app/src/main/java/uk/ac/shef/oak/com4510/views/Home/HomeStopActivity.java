@@ -3,6 +3,7 @@ package uk.ac.shef.oak.com4510.views.Home;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,6 +27,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -39,6 +41,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.ByteArrayOutputStream;
@@ -56,6 +61,7 @@ import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
 import pl.aprilapps.easyphotopicker.MediaFile;
 import pl.aprilapps.easyphotopicker.MediaSource;
+import uk.ac.shef.oak.com4510.MainActivity;
 import uk.ac.shef.oak.com4510.R;
 import uk.ac.shef.oak.com4510.model.Image;
 import uk.ac.shef.oak.com4510.model.Path;
@@ -71,14 +77,16 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
     private ImageViewModel imageViewModel;
     private PathViewModel pathViewModel;
 
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     private Image image;
     private Path imagePath;
     private int pathId;
 
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationClient;
-    private Activity activity;
+    private PendingIntent mLocationPendingIntent;
+
+    private static Activity activity;
     private Location mCurrentLocation;
     private String mLastUpdateTime;
     private ArrayList<LatLng> route = new ArrayList<>();
@@ -91,19 +99,20 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
     private SimpleDateFormat sdf;
     private Calendar calendar;
     private Date date;
+    private long stopTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_stop);
-//        getSupportActionBar().hide();
+        getSupportActionBar().hide();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         pressure_and_temperature.initPressure_and_Temperature(getApplicationContext());
-        pressure_and_temperature.starttemperatureSensor();
-        pressure_and_temperature.startpressureSensor();
+        pressure_and_temperature.startTemperatureSensor();
+        pressure_and_temperature.startPressureSensor();
 
         activity = this;
 
@@ -118,26 +127,9 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
 
-        chronometer = (Chronometer) findViewById(R.id.chronometer);
-        sdf = new SimpleDateFormat("HH:mm:ss");
-        chronometer.setFormat("00:%s");
-        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer ch) {
-                long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
-                if (elapsedMillis > 3600000L) {
-                    chronometer.setFormat("0%s");
-                } else {
-                    chronometer.setFormat("00:%s");
-
-                }
-            }
-        });
-        chronometer.start();
-
         if (allPermissionsGranted()) {
             initEasyImage(); //start camera if permission has been granted by user
-            startLocationUpdates();
+            startLocationUpdates(this);
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
@@ -154,40 +146,53 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation
-                        .getLongitude()))
-                        .title(mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude()));
-
-                pressure = pressure_and_temperature.getPressure();
-                temperature = pressure_and_temperature.getTemperature();
-                sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                try {
-                    date = sdf.parse(sdf.format(calendar.getInstance().getTime()));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                image = new Image(pathId, mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), date);
-
-
-//                EasyImage.openCamera(getActivity(), 0);
                 easyImage.openCameraForImage(getActivity());
             }
         });
+
+        chronometer = (Chronometer) findViewById(R.id.chronometer);
+        sdf = new SimpleDateFormat("HH:mm:ss");
+        chronometer.setFormat("00:%s");
+        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer ch) {
+                long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
+                if (elapsedMillis > 3600000L) {
+                    chronometer.setFormat("0%s");
+                } else {
+                    chronometer.setFormat("00:%s");
+                }
+            }
+        });
+        chronometer.start();
 
         Button stop = (Button) findViewById(R.id.Stop);
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (stop.getText().toString().equals("Stop")) {
+                    stopTime = chronometer.getBase() - SystemClock.elapsedRealtime();
                     stopLocationUpdates();
                     chronometer.stop();
-                    stop.setText("Start");
+                    stop.setText("Restart");
                 } else {
-                    startLocationUpdates();
+                    chronometer.setBase(SystemClock.elapsedRealtime() + stopTime);
+                    startLocationUpdates(getActivity().getApplicationContext());
                     chronometer.start();
                     stop.setText("Stop");
                 }
 
+            }
+        });
+
+        Button finish = (Button) findViewById(R.id.Finish);
+        finish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopLocationUpdates();
+                chronometer.stop();
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -198,7 +203,35 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         mMap.getUiSettings().setZoomControlsEnabled(true);
     }
 
-    private void startLocationUpdates() {
+    private void startLocationUpdates(Context context) {
+//        Intent intent = new Intent(context, HomeStopLocationService.class);
+//        mLocationPendingIntent = PendingIntent.getService(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // Should we show an explanation?
+//            Task<Void> locationTask = mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+//                    mLocationPendingIntent);
+//            if (locationTask != null) {
+//                locationTask.addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        if (e instanceof ApiException) {
+//                            Log.w("MapsActivity", ((ApiException) e).getStatusMessage());
+//                        } else {
+//                            Log.w("MapsActivity", e.getMessage());
+//                        }
+//                    }
+//                });
+//
+//                locationTask.addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        Log.d("MapsActivity", "restarting gps successful!");
+//                    }
+//                });
+//            }
+//
+//            return;
+//        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -280,22 +313,13 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
 
     private void initEasyImage() {
         easyImage = new EasyImage.Builder(this)
-                .setChooserTitle("Pick media")
+                .setChooserTitle("Pick the image")
                 .setCopyImagesToPublicGalleryFolder(false)
-//                .setChooserType(ChooserType.CAMERA_AND_DOCUMENTS)
                 .setChooserType(ChooserType.CAMERA_AND_GALLERY)
-                .setFolderName("EasyImage sample")
+                .setFolderName("Images")
                 .allowMultiple(true)
                 .build();
     }
-
-//    private void initEasyImage() {
-//        EasyImage.configuration(this)
-//                .setImagesFolderName("EasyImage sample")
-//                .setCopyTakenPhotosToPublicGalleryAppFolder(true)
-//                .setCopyPickedImagesToPublicGalleryAppFolder(false)
-//                .setAllowMultiplePickInGallery(true);
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -307,10 +331,22 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
                 for (MediaFile imageFile : imageFiles) {
                     Log.d("EasyImage", "Image file returned: " + imageFile.getFile().toString());
                 }
+                mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation
+                        .getLongitude()))
+                        .title(mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude()));
+
+                pressure = pressure_and_temperature.getPressure();
+                temperature = pressure_and_temperature.getTemperature();
+                sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                try {
+                    date = sdf.parse(sdf.format(calendar.getInstance().getTime()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                image = new Image(pathId, mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), date);
                 Bitmap bitmap = BitmapFactory.decodeFile(imageFiles[0].getFile().getAbsolutePath());
                 byte[] picture = getBitmapAsByteArray(bitmap);
                 image.setPicture(picture);
-
                 insertImage(imageViewModel);
             }
 
@@ -326,60 +362,31 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
     }
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
-//            @Override
-//            public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
-//                //Some error handling
-//                e.printStackTrace();
-//            }
-//
-//            @Override
-//            public void onImagesPicked(List<File> imageFiles, EasyImage.ImageSource source, int type) {
-//                System.out.println(imageFiles.get(0).getAbsolutePath());
-//                Bitmap bitmap= BitmapFactory.decodeFile(imageFiles.get(0).getAbsolutePath());
-//                byte[] picture = getBitmapAsByteArray(bitmap);
-//                image.setPicture(picture);
-//
-//                insertImage(imageViewModel);
-//            }
-//
-//            @Override
-//            public void onCanceled(EasyImage.ImageSource source, int type) {
-//                //Cancel handling, you might wanna remove taken photo if it was canceled
-//                if (source == EasyImage.ImageSource.CAMERA) {
-//                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(getActivity());
-//                    if (photoFile != null) photoFile.delete();
-//                }
-//            }
-//        });
-//    }
 
-        public void insertImage (ImageViewModel imageViewModel){
-            imageViewModel.insertOneImage(image);
-        }
-
-        public static byte[] getBitmapAsByteArray (Bitmap bitmap){
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-            return outputStream.toByteArray();
-        }
-
-        private boolean allPermissionsGranted () {
-
-            for (String permission : REQUIRED_PERMISSIONS) {
-                if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public Activity getActivity () {
-            return activity;
-        }
-
+    public void insertImage (ImageViewModel imageViewModel){
+        imageViewModel.insertOneImage(image);
     }
+
+    public static byte[] getBitmapAsByteArray (Bitmap bitmap){
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        return outputStream.toByteArray();
+    }
+
+    private boolean allPermissionsGranted () {
+         for (String permission : REQUIRED_PERMISSIONS) {
+             if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                 return false;
+             }
+         }
+         return true;
+    }
+
+    public static Activity getActivity () {
+        return activity;
+    }
+
+    public static GoogleMap getMap() {
+        return mMap;
+    }
+}

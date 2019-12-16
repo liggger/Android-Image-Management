@@ -51,17 +51,23 @@ public class PathFragment extends Fragment {
 
         pathViewModel.getPaths().observe(this, new Observer<List<Path>>() {
             @Override
-            public void onChanged(List<Path> paths) {
-                if (paths.size() == 0) {
-                    System.out.println("No");
-                } else {
-                    pathAdapter = new PathAdapter(paths);
-                    recyclerView = root.findViewById(R.id.recycler_view);
-                    linearLayoutManager = new LinearLayoutManager(getContext());
-                    recyclerView.setLayoutManager(linearLayoutManager);
-                    recyclerView.setAdapter(pathAdapter);
-                    recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
-                }
+            public void onChanged(@Nullable List<Path> paths) {
+//                if (paths.size() == 0) {
+//                    System.out.println("No");
+//                } else {
+//                    pathAdapter = new PathAdapter(paths);
+//                    recyclerView = root.findViewById(R.id.recycler_view);
+//                    linearLayoutManager = new LinearLayoutManager(getContext());
+//                    recyclerView.setLayoutManager(linearLayoutManager);
+//                    recyclerView.setAdapter(pathAdapter);
+//                    recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+//                }
+                pathAdapter = new PathAdapter(paths);
+                recyclerView = root.findViewById(R.id.recycler_view);
+                linearLayoutManager = new LinearLayoutManager(getContext());
+                recyclerView.setLayoutManager(linearLayoutManager);
+                recyclerView.setAdapter(pathAdapter);
+                recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
             }
         });
 

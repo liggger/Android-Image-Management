@@ -10,8 +10,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -22,7 +24,7 @@ import uk.ac.shef.oak.com4510.viewmodels.ImageViewModel;
 
 public class GalleryFragment extends Fragment {
     private ImageViewModel imageViewModel;
-    private GalleryAdapter galleryAdapter;
+    private GalleryAdapter galleryAdapter = new GalleryAdapter();
     private RecyclerView recyclerView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -32,16 +34,17 @@ public class GalleryFragment extends Fragment {
         imageViewModel =
                 ViewModelProviders.of(this).get(ImageViewModel.class);
 
-        imageViewModel.getImages().observe(this, new Observer<List<Image>>() {
+        imageViewModel.getImagesByDate().observe(this, new Observer<PagedList<Image>>() {
             @Override
-            public void onChanged(List<Image> images) {
+            public void onChanged(@Nullable PagedList<Image> images) {
                 if (images != null) {
-                    galleryAdapter = new GalleryAdapter(images);
+//                    galleryAdapter = new GalleryAdapter(images);
+                    galleryAdapter.submitList(images);
                     recyclerView = v.findViewById(R.id.recycler_view);
                     int numberOfColumns = 4;
                     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), numberOfColumns));
+//                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
                     recyclerView.setAdapter(galleryAdapter);
-//                    recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
                 }
             }
         });

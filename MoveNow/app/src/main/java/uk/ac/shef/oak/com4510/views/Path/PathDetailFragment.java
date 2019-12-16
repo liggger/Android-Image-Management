@@ -50,7 +50,7 @@ public class PathDetailFragment extends Fragment {
         path_id = Integer.parseInt(getArguments().getString("path_id"));
         textView = v.findViewById(R.id.Title);
         textView.setText(title);
-        imageViewModel.findImagesById(path_id).observe(this, new Observer<List<Image>>() {
+        imageViewModel.findImagesByPathId(path_id).observe(this, new Observer<List<Image>>() {
             @Override
             public void onChanged(List<Image> images) {
                 if (images != null) {

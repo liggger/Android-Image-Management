@@ -12,8 +12,18 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @description The Converters.
+ * @author Zhicheng Zhou
+ */
+
 public class Converters {
 
+    /**
+     * String to double list.
+     * @param data String data.
+     * @return Double list.
+     */
     @TypeConverter
     public static List<Double> stringToDoubleList(String data) {
         Gson gson = new Gson();
@@ -26,12 +36,22 @@ public class Converters {
         return gson.fromJson(data, listType);
     }
 
+    /**
+     * Double list to String.
+     * @param list Double list.
+     * @return String value.
+     */
     @TypeConverter
-    public static String DoubleListToString(List<Double> latitude_list) {
+    public static String DoubleListToString(List<Double> list) {
         Gson gson = new Gson();
-        return gson.toJson(latitude_list);
+        return gson.toJson(list);
     }
 
+    /**
+     * String to Date.
+     * @param value String value.
+     * @return Date.
+     */
     @TypeConverter
     public static Date fromString(String value) {
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -44,6 +64,11 @@ public class Converters {
         return date;
     }
 
+    /**
+     * Date to String.
+     * @param date The Date.
+     * @return String date.
+     */
     @TypeConverter
     public static String dateToString(Date date) {
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");

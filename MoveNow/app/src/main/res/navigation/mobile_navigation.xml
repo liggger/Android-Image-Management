@@ -63,5 +63,18 @@
         android:id="@+id/imageFragment"
         android:name="uk.ac.shef.oak.com4510.views.Path.ImageFragment"
         android:label="fragment_image"
-        tools:layout="@layout/fragment_image" />
+        tools:layout="@layout/fragment_image" >
+        <action
+            android:id="@+id/action_imageFragment_to_imageFullFragment"
+            app:destination="@id/imageFullFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/imageFullFragment"
+        android:name="uk.ac.shef.oak.com4510.views.Path.ImageFullFragment"
+        android:label="fragment_image_full"
+        tools:layout="@layout/fragment_image_full" >
+        <action
+            android:id="@+id/action_imageFullFragment_to_imageFragment"
+            app:destination="@id/imageFragment" />
+    </fragment>
 </navigation>

@@ -14,48 +14,55 @@ import java.util.List;
 import uk.ac.shef.oak.com4510.model.Image;
 import uk.ac.shef.oak.com4510.model.Path;
 
+/**
+ * @description The ImageViewModel.
+ * @author Zhicheng Zhou
+ */
 
 public class ImageViewModel extends AndroidViewModel {
     private ImageRepository imageRepository;
 
-    private LiveData<Image> imageToDisplay;
-    private LiveData<Image> images;
-
+    /**
+     * The constructor of the ImageViewModel.
+     * @param application
+     */
     public ImageViewModel(@NonNull Application application) {
         super(application);
-        int path_id;
         imageRepository = new ImageRepository(application);
-        imageToDisplay = imageRepository.getOneImage();
     }
 
-    public LiveData<Image> getImageToDisplay() {
-        if (imageToDisplay == null) {
-            imageToDisplay = new MutableLiveData<Image>();
-        }
-        return imageToDisplay;
-    }
-
-    public LiveData<List<Image>> getImages() {
-        return imageRepository.getImages();
-    }
-
+    /**
+     * Get the whole images by date in ascending order.
+     * For every 20 pages, it will load more pages.
+     * @return PagedList images.
+     */
     public final LiveData<PagedList<Image>> getImagesByDate() {
         return imageRepository.getImagesByDate();
     }
 
+    /**
+     * Insert the image.
+     * @param image The image.
+     */
     public void insertOneImage(Image image) {
         imageRepository.insertOneImage(image);
     }
 
-//    public LiveData<List<Image>> findImagesById(int path_id) {
-//        return imageRepository.findImagesByPath(path_id);
-//    }
-
+    /**
+     * Find images according to the path id.
+     * @param path_id The path id.
+     * @return The images.
+     */
     public LiveData<List<Image>> findImagesByPathId(int path_id) {
         return imageRepository.findImagesByPathId(path_id);
     }
 
-        public LiveData<Image> findImageByImageId(int image_id) {
+    /**
+     * Find the image according to the image id.
+     * @param image_id The image id.
+     * @return The image.
+     */
+    public LiveData<Image> findImageByImageId(int image_id) {
         return imageRepository.findImageByImageId(image_id);
     }
 }

@@ -2,17 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="uk.ac.shef.oak.com4510">
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
-    <uses-permission android:name="android.permission.RECEIVE_LAUNCH_BROADCASTS"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-
-    <!--required by Android 9-->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.RECEIVE_LAUNCH_BROADCASTS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- required by Android 9 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -26,7 +22,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAQ4ZDGyQlHdzmY28GwFEG_JxtPFQ59sAU" />
 
-        <activity android:name=".views.Home.HomeStopActivity"></activity>
+        <activity android:name=".views.Home.HomeStopActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,16 +31,15 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".views.Home.Service.JobService"
+        <service
+            android:name=".views.Home.Service.JobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".views.Home.Service.Service"
             android:clearTaskOnLaunch="true"
             android:enabled="true"
             android:excludeFromRecents="true"
-            android:launchMode="singleInstance"
-            />
+            android:launchMode="singleInstance" />
 
         <receiver
             android:name=".views.Home.Service.RestartServiceBroadcastReceiver"
@@ -52,11 +47,12 @@
             android:exported="true"
             android:label="StartMyServiceAtBootReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-                <action android:name="uk.ac.shef.oak.activity_recognition.sensor_service.RestartSensor"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="uk.ac.shef.oak.activity_recognition.sensor_service.RestartSensor" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
     </application>

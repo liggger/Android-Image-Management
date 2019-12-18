@@ -17,6 +17,11 @@ public class JobService extends android.app.job.JobService {
     private static JobService instance;
     private static JobParameters jobParameters;
 
+    /**
+     * Called to indicate that the job has begun executing.
+     * @param jobParameters The JobParameters.
+     * @return {@code false} means that this job has completed its work.
+     */
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         ProcessMainClass bck = new ProcessMainClass();
@@ -30,10 +35,11 @@ public class JobService extends android.app.job.JobService {
 
     private void registerRestarterReceiver() {
 
-        // the context can be null if app just installed and this is called from restartsensorservice
-        // https://stackoverflow.com/questions/24934260/intentreceiver-components-are-not-allowed-to-register-to-receive-intents-when
-        // Final decision: in case it is called from installation of new version (i.e. from manifest, the application is
-        // null. So we must use context.registerReceiver. Otherwise this will crash and we try with context.getApplicationContext
+        /*
+          the context can be null if app just installed and this is called from restartsensorservice
+          Final decision: in case it is called from installation of new version (i.e. from manifest, the application is
+          null. So we must use context.registerReceiver. Otherwise this will crash and we try with context.getApplicationContext
+         */
         if (restartSensorServiceReceiver == null)
             restartSensorServiceReceiver = new RestartServiceBroadcastReceiver();
         else try{
@@ -64,9 +70,11 @@ public class JobService extends android.app.job.JobService {
     }
 
     /**
-     * called if Android kills the job service
-     * @param jobParameters
-     * @return
+     * Called if Android kills the job service.
+     * @param jobParameters The JobParameters.
+     * @return {@code true} to indicate to the JobManager whether you'd like to reschedule
+     * this job based on the retry criteria provided at job creation-time; or {@code false}
+     * to end the job entirely.
      */
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
@@ -86,8 +94,8 @@ public class JobService extends android.app.job.JobService {
 
 
     /**
-     * called when the tracker is stopped for whatever reason
-     * @param context
+     * called when the tracker is stopped for whatever reason.
+     * @param context The context.
      */
     public static void stopJob(Context context) {
         if (instance!=null && jobParameters!=null) {

@@ -1,34 +1,31 @@
 package uk.ac.shef.oak.com4510.views.Home;
 
-import android.Manifest;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.View;
+
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -40,22 +37,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.Objects;
 
 import pl.aprilapps.easyphotopicker.ChooserType;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
@@ -71,57 +63,99 @@ import uk.ac.shef.oak.com4510.viewmodels.PathViewModel;
 import uk.ac.shef.oak.com4510.views.Home.Service.ProcessMainClass;
 import uk.ac.shef.oak.com4510.views.Home.Service.RestartServiceBroadcastReceiver;
 
+/**
+ * @description The activity when the tracking is on.
+ * @author Legao Dai, Zhicheng Zhou
+ */
+
 public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCallback {
-    private static final int ACCESS_FINE_LOCATION = 123;
+    // The request code permissions.
     private static final int REQUEST_CODE_PERMISSIONS = 101;
+    // The required permissions.
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
 
+    // The EasyImage.
     private EasyImage easyImage;
+    // The ImageViewModel.
     private ImageViewModel imageViewModel;
+    // The PathViewModel.
     private PathViewModel pathViewModel;
 
+    // The GoogleMap.
     private static GoogleMap mMap;
+    // The image taken by the camera.
     private Image image;
+    // The current path.
     private Path imagePath;
+    // The current path id.
     private int pathId;
 
-    private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationClient;
-    private PendingIntent mLocationPendingIntent;
 
-    private static Activity activity;
+    private Activity activity;
+    // The current location.
     private Location mCurrentLocation;
-    private String mLastUpdateTime;
+    // The LatLng list.
     private ArrayList<LatLng> route = new ArrayList<>();
+    // The latitude list.
     private ArrayList<Double> currentLatitudeList = new ArrayList<>();
+    // The longitude list.
     private ArrayList<Double> currentLongitudeList = new ArrayList<>();
-    private Polyline polyline;
-    private Pressure_and_Temperature pressure_and_temperature = new Pressure_and_Temperature();
-    private String temperature, pressure;
-    private Chronometer chronometer;
-    private SimpleDateFormat sdf;
-    private Calendar calendar;
-    private Date date;
-    private long stopTime;
 
+    // The temperature sensor and the pressure sensor.
+    private Pressure_and_Temperature pressure_and_temperature = new Pressure_and_Temperature();
+    // The value of the temperature sensor and the pressure sensor.
+    private String temperature, pressure;
+    // The chronometer.
+    private Chronometer chronometer;
+    // The date format.
+    private SimpleDateFormat sdf;
+    // The date.
+    private Date date;
+    // Store the time when the stop button is clicked.
+    private long stopTime;
+    // The coordinate TextView.
+    private TextView coordinate;
+
+    /**
+     * Initialize the activity.
+     * @param savedInstanceState The savedInstanceState
+     */
+    @SuppressLint({"SetTextI18n", "SimpleDateFormat"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_stop);
-        getSupportActionBar().hide();
+
+        // Hide the ActionBar if it is currently showing.
+        Objects.requireNonNull(getSupportActionBar()).hide();
+        // Get the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // Get the coordinate textView.
+        coordinate = findViewById(R.id.coordinate);
+
+        // Initialize the sensors.
         pressure_and_temperature.initPressure_and_Temperature(getApplicationContext());
+        // Start the temperature sensor.
         pressure_and_temperature.startTemperatureSensor();
+        // Start the pressure sensor.
         pressure_and_temperature.startPressureSensor();
 
+        // Get the activity.
         activity = this;
 
+        // Creates a ImageViewModel.
         imageViewModel = ViewModelProviders.of(this).get(ImageViewModel.class);
+        // Creates a PathViewModel.
         pathViewModel = ViewModelProviders.of(this).get(PathViewModel.class);
 
+        /*
+          Get the latest path.
+          Adds the given observer to the observers list within the lifespan of the given owner.
+         */
         pathViewModel.getOnePath().observe(this, new Observer<Path>() {
             @Override
             public void onChanged(Path path) {
@@ -130,104 +164,116 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
 
+        // Check whether the permissions are granted.
         if (allPermissionsGranted()) {
-            initEasyImage(); //start camera if permission has been granted by user
-            startLocationUpdates(this);
+            // Initialize the camera.
+            initEasyImage();
+            // Start updating the location.
+            startLocationUpdates();
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
 
+        /*
+          Find the FloatingActionButton gallery,
+          if clicked, open the gallery.
+         */
         FloatingActionButton fabGallery = findViewById(R.id.fab_gallery);
-        fabGallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                easyImage.openGallery(getActivity());
-            }
-        });
+        fabGallery.setOnClickListener(v -> easyImage.openGallery(getActivity()));
 
+        /*
+          Find the FloatingActionButton camera,
+          if clicked, open the camera.
+         */
         FloatingActionButton fab = findViewById(R.id.fab_camera);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                easyImage.openCameraForImage(getActivity());
-            }
-        });
+        fab.setOnClickListener(view -> easyImage.openCameraForImage(getActivity()));
 
-        chronometer = (Chronometer) findViewById(R.id.chronometer);
+        /*
+          Find the textView chronometer, sets the format string used for display.
+          Sets the listener to be called when the chronometer changes.
+         */
+        chronometer = findViewById(R.id.chronometer);
         sdf = new SimpleDateFormat("HH:mm:ss");
         chronometer.setFormat("00:%s");
-        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer ch) {
-                long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
-                if (elapsedMillis > 3600000L) {
-                    chronometer.setFormat("0%s");
-                } else {
-                    chronometer.setFormat("00:%s");
-                }
+        chronometer.setOnChronometerTickListener(ch -> {
+            long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
+            if (elapsedMillis > 3600000L) {
+                chronometer.setFormat("0%s");
+            } else {
+                chronometer.setFormat("00:%s");
             }
         });
         chronometer.start();
 
-        Button stop = (Button) findViewById(R.id.Stop);
-        stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (stop.getText().toString().equals("Stop")) {
-                    stopTime = chronometer.getBase() - SystemClock.elapsedRealtime();
-                    stopLocationUpdates();
-                    chronometer.stop();
-                    stop.setText("Restart");
-                } else {
-                    chronometer.setBase(SystemClock.elapsedRealtime() + stopTime);
-                    startLocationUpdates(getActivity().getApplicationContext());
-                    chronometer.start();
-                    stop.setText("Stop");
-                }
-
-            }
-        });
-
-        Button finish = (Button) findViewById(R.id.Finish);
-        finish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        /*
+          Find the button stop, if the button is clicked,
+          if the text is stop, stop the chronometer, stop the service and set the text 'Restart',
+          else, start the chronometer, start the service and set the text 'Stop'.
+         */
+        Button stop = findViewById(R.id.Stop);
+        stop.setOnClickListener(v -> {
+            if (stop.getText().toString().equals("Stop")) {
+                stopTime = chronometer.getBase() - SystemClock.elapsedRealtime();
                 stopLocationUpdates();
                 chronometer.stop();
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
+                stop.setText("Restart");
+            } else {
+                chronometer.setBase(SystemClock.elapsedRealtime() + stopTime);
+                startLocationUpdates();
+                chronometer.start();
+                stop.setText("Stop");
             }
+
+        });
+
+        /*
+          Find the button finish, if the button is clicked,
+          stop the chronometer, stop the service and start the intent to the MainActivity.
+         */
+        Button finish = findViewById(R.id.Finish);
+        finish.setOnClickListener(v -> {
+            stopLocationUpdates();
+            chronometer.stop();
+            pressure_and_temperature.stopPressureSensor();
+            pressure_and_temperature.stopTemperatureSensor();
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            startActivity(intent);
         });
     }
 
+    /**
+     * Initialize the GoogleMap.
+     * @param googleMap The GoogleMap.
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setZoomControlsEnabled(true);
     }
 
-    private void startLocationUpdates(Context context) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-            } else {
-
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        ACCESS_FINE_LOCATION);
-            }
-
-            return;
-        }
-        mLocationRequest = new LocationRequest();
+    /**
+     * Start updating the location for every 20 seconds.
+     */
+    private void startLocationUpdates() {
+        /*
+          Create a new LocationRequest,
+          set the interval,
+          set the priority.
+         */
+        LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(20000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        // Set the FusedLocationProviderClient.
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        // Request for a update.
         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null /* Looper */);
 
+        /*
+          If the version is Android 7 onwards, use Job Services,
+          else, use the ProcessMainClass.
+         */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             RestartServiceBroadcastReceiver.scheduleJob(getApplicationContext());
         } else {
@@ -243,28 +289,48 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
+    /**
+     * When the location is called back, update the sensors and the current locations.
+     */
     LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             super.onLocationResult(locationResult);
+            // Get the latest location.
             mCurrentLocation = locationResult.getLastLocation();
-            mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-            Log.i("MAP", "new location " + mCurrentLocation.toString());
+            // Print the new location, current pressure and temperature.
+            Log.i("MAP", "New location: (" + mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude() + ")");
+            Log.i("MAP", "Current pressure: " + pressure_and_temperature.getPressure());
+            Log.i("MAP", "Current temperature: " + pressure_and_temperature.getTemperature());
+
             if (mMap != null) {
+                // Add the latitude to the list.
                 currentLatitudeList.add(mCurrentLocation.getLatitude());
+                // Add the longitude to the list.
                 currentLongitudeList.add(mCurrentLocation.getLongitude());
+                // Add the LatLng to the route.
                 route.add(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
             }
+
+            // Set the text of the coordinate textView.
+            coordinate.setText(String.format("(%s, %s)", mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+            // Get the pressure.
             pressure = pressure_and_temperature.getPressure();
+            // Get the temperature.
             temperature = pressure_and_temperature.getTemperature();
 
+            /*
+              Update the imagePath's LatitudeList, LongitudeList, pressure and temperature.
+             */
             imagePath.setLatitudeList(currentLatitudeList);
             imagePath.setLongitudeList(currentLongitudeList);
             imagePath.setPressure(pressure);
             imagePath.setTemperature(temperature);
             pathViewModel.updatePath(imagePath);
 
-            polyline = mMap.addPolyline(new PolylineOptions().addAll(route).width(10).color(Color.BLUE));
+            // AddPolyline at the GoogleMap.
+            mMap.addPolyline(new PolylineOptions().addAll(route).width(10).color(Color.BLUE));
+            // Move to the new LatLng.
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), 14.0f));
 
         }
@@ -275,24 +341,9 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         super.onPause();
     }
 
-    @SuppressLint("MissingPermission")
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-                            mLocationCallback, null /* Looper */);
-                }
-                return;
-            }
-
-        }
-    }
-
+    /**
+     * Initialize the EasyImage.
+     */
     private void initEasyImage() {
         easyImage = new EasyImage.Builder(this)
                 .setChooserTitle("Pick the image")
@@ -303,32 +354,64 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
                 .build();
     }
 
+    /**
+     * Called when an activity launched exits
+     * @param requestCode  The integer request code.
+     * @param resultCode The integer result code returned
+     *                   by the child activity through its setResult().
+     * @param data An Intent, which can return result data to the caller.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         easyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
+
+            /**
+             * When the image is taken by the camera or is chosen in the gallery,
+             * add a marker in the map, and insert the image.
+             * @param imageFiles The imageFiles taken by the camera.
+             * @param source The source
+             */
+            @SuppressLint("SimpleDateFormat")
             @Override
-            public void onMediaFilesPicked(MediaFile[] imageFiles, MediaSource source) {
+            public void onMediaFilesPicked(@NonNull MediaFile[] imageFiles, @NonNull MediaSource source) {
+                // Print the image information.
                 for (MediaFile imageFile : imageFiles) {
                     Log.d("EasyImage", "Image file returned: " + imageFile.getFile().toString());
                 }
+
+                // Add a marker according to the current latitude and longitude.
                 mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation
                         .getLongitude()))
-                        .title(mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude()));
+                        .title(String.format("%s, %s", mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())));
 
+                // Get the current pressure.
                 pressure = pressure_and_temperature.getPressure();
+                // Get the current temperature.
                 temperature = pressure_and_temperature.getTemperature();
+
+                /*
+                  Constructs a <code>SimpleDateFormat</code> using the given pattern and
+                  the default date format symbols.
+                 */
                 sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 try {
-                    date = sdf.parse(sdf.format(calendar.getInstance().getTime()));
+                    // Parses text from the given string to produce a date.
+                    date = sdf.parse(sdf.format(Calendar.getInstance().getTime()));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+
+                // Initialize the image, and converter the imageFile to the byte array.
                 image = new Image(pathId, mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), date);
                 Bitmap bitmap = BitmapFactory.decodeFile(imageFiles[0].getFile().getAbsolutePath());
                 byte[] picture = getBitmapAsByteArray(bitmap);
+
+                // Set the picture.
                 image.setPicture(picture);
+
+                // Insert the image.
                 insertImage(imageViewModel);
             }
 
@@ -345,16 +428,29 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         });
     }
 
+    /**
+     * Insert the image taken by the camera.
+     * @param imageViewModel The ImageViewModel.
+     */
     public void insertImage (ImageViewModel imageViewModel){
         imageViewModel.insertOneImage(image);
     }
 
+    /**
+     * Write a compressed version of the bitmap to the outPutStream.
+     * @param bitmap The bitmap of the image taken by the camera.
+     * @return The newly allocated byte array.
+     */
     public static byte[] getBitmapAsByteArray (Bitmap bitmap){
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
         return outputStream.toByteArray();
     }
 
+    /**
+     * Check whether the permissions are granted.
+     * @return True if the permissions are granted, else, return false.
+     */
     private boolean allPermissionsGranted () {
          for (String permission : REQUIRED_PERMISSIONS) {
              if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -364,11 +460,12 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
          return true;
     }
 
-    public static Activity getActivity () {
+    /**
+     * Get the current activity.
+     * @return The current activity.
+     */
+    public Activity getActivity () {
         return activity;
     }
 
-    public static GoogleMap getMap() {
-        return mMap;
-    }
 }

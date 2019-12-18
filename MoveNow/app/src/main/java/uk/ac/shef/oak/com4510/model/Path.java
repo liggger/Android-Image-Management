@@ -8,32 +8,55 @@ import androidx.room.TypeConverters;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @description The Path entity.
+ * @author Zhicheng Zhou
+ */
+
 @Entity
 @TypeConverters({Converters.class})
 public class Path {
 
+    // The path id.
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "path_id")
     private int path_id;
 
+    // The path title.
     @ColumnInfo(name = "title")
     private String title;
 
+    // The date of the tracking time.
     @ColumnInfo(name = "date")
     private Date date;
 
+    // The latest pressure data for every 20 seconds.
     @ColumnInfo(name = "pressure")
     private String pressure;
 
+    // The latest temperature data for every 20 seconds.
     @ColumnInfo(name = "temperature")
     private String temperature;
 
+    // All the pictures' latitude.
     @ColumnInfo(name = "latitude_list")
     private List<Double> latitudeList;
 
+    // All the pictures' longitude.
     @ColumnInfo(name = "longitude_list")
     private List<Double> longitudeList;
 
+    /**
+     * The constructor of the path.
+     * The path id generates automatically.
+     *
+     * @param title The path title.
+     * @param date The path date.
+     * @param pressure The value of the pressure sensor.
+     * @param temperature The value of the temperature sensor.
+     * @param latitudeList The latitude list.
+     * @param longitudeList The longitude list.
+     */
     public Path(String title, Date date, String pressure, String temperature, List<Double> latitudeList, List<Double> longitudeList) {
         this.title = title;
         this.date = date;
@@ -42,6 +65,10 @@ public class Path {
         this.latitudeList = latitudeList;
         this.longitudeList = longitudeList;
     }
+
+    /*
+      The getters and the setters.
+     */
 
     public int getPath_id() {
         return path_id;

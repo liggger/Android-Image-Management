@@ -7,4 +7,5 @@
     <color name="Path">#000000</color>
     <color name="Black">#000000</color>
     <color name="Background">#ffffff</color>
+    <color name="pathBackground">#E4E3E3</color>
 </resources>

@@ -13,47 +13,67 @@ import uk.ac.shef.oak.com4510.model.Image;
 import uk.ac.shef.oak.com4510.model.ImageDao;
 import uk.ac.shef.oak.com4510.model.ImagePathDatabase;
 
+/**
+ * @description The ImageRepository.
+ * @author Zhicheng Zhou
+ */
+
 public class ImageRepository {
+
     private ImageDao imageDao;
 
-    public ImageRepository(Context context) {
+    /**
+     * The constructor of the ImageRepository and get the value of the imageDao.
+     * @param context The context.
+     */
+    ImageRepository(Context context) {
         ImagePathDatabase imageDatabase = ImagePathDatabase.getDatabase(context.getApplicationContext());
         imageDao = imageDatabase.getImageDao();
     }
 
-    public void insertOneImage(Image image) {
+    /**
+     * Insert one image using asynchronous task.
+     * @param image The image to be inserted.
+     */
+    void insertOneImage(Image image) {
         new InsertAsyncTask(imageDao).execute(image);
     }
 
-    public LiveData<Image> getOneImage() {
-        return imageDao.getOneImage();
-    }
-
-    public LiveData<List<Image>> getImages() {
-        return imageDao.getImages();
-    }
-
-    public LiveData<PagedList<Image>> getImagesByDate() {
+    /**
+     * Get the whole images by date in ascending order.
+     * For every 20 pages, it will load more pages.
+     * @return PagedList images.
+     */
+    LiveData<PagedList<Image>> getImagesByDate() {
         return new LivePagedListBuilder<>(
                 imageDao.getImagesByDate(), 20).build();
     }
 
-//    public LiveData<List<Image>> findImagesByPath(int path_id) {
-//        return imageDao.findImagesByPath(path_id);
-//    }
-
-    public LiveData<List<Image>> findImagesByPathId(int path_id) {
+    /**
+     * Find the target images according to the path id.
+     * @param path_id The path id.
+     * @return The target images.
+     */
+    LiveData<List<Image>> findImagesByPathId(int path_id) {
         return imageDao.findImagesByPathId(path_id);
     }
 
-    public LiveData<Image> findImageByImageId(int image_id) {
+    /**
+     * Find the target image according to the image id.
+     * @param image_id The image id.
+     * @return The target image.
+     */
+    LiveData<Image> findImageByImageId(int image_id) {
         return imageDao.findImageByImageId(image_id);
     }
 
+    /**
+     * Insert the image using AsyncTak.
+     */
     private static class InsertAsyncTask extends AsyncTask<Image, Void, Void> {
         private ImageDao imageDao;
 
-        public InsertAsyncTask(ImageDao imageDao) {this.imageDao = imageDao;}
+        InsertAsyncTask(ImageDao imageDao) {this.imageDao = imageDao;}
 
         @Override
         protected Void doInBackground(final Image... image) {

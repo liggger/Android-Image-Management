@@ -50,7 +50,7 @@ public class Service extends android.app.Service {
             restartForeground();
         }
 
-        startTimer();
+//        startTimer();
 
         // return start sticky so if it is killed by android, it will be restarted with Intent null
         return START_STICKY;
@@ -79,7 +79,7 @@ public class Service extends android.app.Service {
                 Notification notification = new Notification();
                 startForeground(NOTIFICATION_ID, notification.setNotification(this, "Service notification", "This is the service's notification", R.drawable.ic_sleep));
                 Log.i(TAG, "restarting foreground successful");
-                startTimer();
+//                startTimer();
             } catch (Exception e) {
                 Log.e(TAG, "Error in notification " + e.getMessage());
             }
@@ -94,7 +94,6 @@ public class Service extends android.app.Service {
         // restart the never ending service
         Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
         sendBroadcast(broadcastIntent);
-        stoptimertask();
     }
 
 
@@ -111,56 +110,6 @@ public class Service extends android.app.Service {
         // restart the never ending service
         Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
         sendBroadcast(broadcastIntent);
-        // do not call stoptimertask because on some phones it is called asynchronously
-        // after you swipe out the app and therefore sometimes
-        // it will stop the timer after it was restarted
-        // stoptimertask();
-    }
-
-
-    /**
-     * static to avoid multiple timers to be created when the service is called several times
-     */
-    private static Timer timer;
-    private static TimerTask timerTask;
-    long oldTime = 0;
-
-    public void startTimer() {
-        Log.i(TAG, "Starting timer");
-
-        //set a new Timer - if one is already running, cancel it to avoid two running at the same time
-        stoptimertask();
-        timer = new Timer();
-
-        //initialize the TimerTask's job
-        initializeTimerTask();
-
-        Log.i(TAG, "Scheduling...");
-        //schedule the timer, to wake up every 1 second
-        timer.schedule(timerTask, 1000, 1000); //
-    }
-
-    /**
-     * it sets the timer to print the counter every x seconds
-     */
-    public void initializeTimerTask() {
-        Log.i(TAG, "initialising TimerTask");
-        timerTask = new TimerTask() {
-            public void run() {
-                Log.i("in timer", "in timer ++++  " + (counter++));
-            }
-        };
-    }
-
-    /**
-     * not needed
-     */
-    public void stoptimertask() {
-        //stop the timer, if it's not already null
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
     }
 
     public static Service getmCurrentService() {

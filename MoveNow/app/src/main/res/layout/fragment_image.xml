@@ -35,27 +35,27 @@
         android:layout_height="wrap_content"
         android:text="Temp"
         android:textColor="@color/Path"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline14"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.083"
+        app:layout_constraintHorizontal_bias="0.081"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline11"
-        app:layout_constraintVertical_bias="0.555" />
+        app:layout_constraintVertical_bias="0.526" />
 
     <TextView
         android:id="@+id/Pressure"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pressure: 1013.25"
+        android:text="Pressure: 1013.25 mbars"
         android:textColor="@color/Path"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline14"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.875"
+        app:layout_constraintHorizontal_bias="0.866"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline11"
-        app:layout_constraintVertical_bias="0.555" />
+        app:layout_constraintVertical_bias="0.526" />
 
     <fragment
         android:id="@+id/map"

@@ -65,4 +65,12 @@ public class ImageViewModel extends AndroidViewModel {
     public LiveData<Image> findImageByImageId(int image_id) {
         return imageRepository.findImageByImageId(image_id);
     }
+
+    /**
+     * Count the image number.
+     * @return The image number.
+     */
+    public LiveData<Integer> countImageNumber() {
+        return imageRepository.countImageNumber();
+    }
 }

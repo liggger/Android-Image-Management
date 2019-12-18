@@ -4,11 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,6 +82,30 @@ public class PathImageFragment extends Fragment {
         });
 
         return root;
+    }
+
+    /**
+     * Creates the activity
+     *
+     * @param savedInstanceState State
+     */
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // Finds the first descendant imageView with the given ID.
+        ImageView imageView = getView().findViewById(R.id.imagePathBack);
+        // Register a callback to be invoked when this imageView is clicked.
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /**
+                 * Find a {@link NavController} given a local {@link View}.
+                 */
+                NavController controller = Navigation.findNavController(v);
+                controller.navigate(R.id.action_pathImageFragment_to_navigation_paths);
+            }
+        });
     }
 
 }

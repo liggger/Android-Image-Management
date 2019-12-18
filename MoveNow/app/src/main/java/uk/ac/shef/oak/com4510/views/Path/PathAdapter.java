@@ -79,11 +79,6 @@ public class PathAdapter extends RecyclerView.Adapter<PathAdapter.ViewHolder>  {
 
     @Override
     public void onBindViewHolder(@NonNull final PathAdapter.ViewHolder holder, final int position) {
-        // If the position number is even, set the background color white.
-        if (position % 2 == 0) {
-            holder.constraintLayout.setBackgroundColor(Color.WHITE);
-        }
-
         // Constructs a SimpleDateFormat using the given pattern.
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -103,6 +98,7 @@ public class PathAdapter extends RecyclerView.Adapter<PathAdapter.ViewHolder>  {
         });
         // Set the date.
         holder.date.setText(String.format("%s   %s", format.format(paths.get(position).getDate()), paths.get(position).getTitle()));
+//        holder.date.setText(format.format(paths.get(position).getDate()) + paths.get(position).getTitle());
     }
 
     /**

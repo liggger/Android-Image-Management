@@ -52,4 +52,7 @@ public interface PathDao {
      */
     @Update
     void updatePath(Path path);
+
+    @Query("SELECT COUNT(path_id) from path")
+    LiveData<Integer> countPathNumber();
 }

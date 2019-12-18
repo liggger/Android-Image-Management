@@ -70,6 +70,14 @@ public class PathRepository {
     }
 
     /**
+     * Count the path number.
+     * @return The path number.
+     */
+    public LiveData<Integer> countPathNumber() {
+        return pathDao.countPathNumber();
+    }
+
+    /**
      * Insert the path using the AsyncTask.
      */
     private static class InsertAsyncTask extends AsyncTask<Path, Void, Void> {

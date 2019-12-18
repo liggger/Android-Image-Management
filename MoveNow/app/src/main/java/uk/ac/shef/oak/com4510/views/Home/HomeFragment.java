@@ -31,8 +31,11 @@ import uk.ac.shef.oak.com4510.viewmodels.PathViewModel;
 public class HomeFragment extends Fragment implements View.OnFocusChangeListener {
 
     private PathViewModel pathViewModel;
+    // The title edit text.
     private EditText title;
+    // The start button.
     private Button start;
+    // The date.
     private Date date;
 
     /**

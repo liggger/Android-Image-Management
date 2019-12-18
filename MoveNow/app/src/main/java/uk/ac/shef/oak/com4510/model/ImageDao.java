@@ -45,5 +45,6 @@ public interface ImageDao {
     @Query("SELECT * FROM Image WHERE image_id = :image_id")
     LiveData<Image> findImageByImageId(int image_id);
 
-
+    @Query("SELECT COUNT(image_id) from image")
+    LiveData<Integer> countImageNumber();
 }

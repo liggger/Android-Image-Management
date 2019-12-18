@@ -49,6 +49,9 @@
         <action
             android:id="@+id/action_pathImageFragment_to_imageFragment"
             app:destination="@id/imageFragment" />
+        <action
+            android:id="@+id/action_pathImageFragment_to_navigation_paths"
+            app:destination="@id/navigation_paths" />
     </fragment>
     <fragment
         android:id="@+id/pathDetailFragment"

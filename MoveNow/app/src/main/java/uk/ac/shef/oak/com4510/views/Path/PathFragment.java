@@ -89,7 +89,7 @@ public class PathFragment extends Fragment {
     }
 
     /**
-     * Creates the activity
+     * Create the activity
      *
      * @param savedInstanceState State
      */

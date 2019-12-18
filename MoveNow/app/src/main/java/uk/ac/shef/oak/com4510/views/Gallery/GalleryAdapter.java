@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
@@ -102,7 +103,7 @@ public class GalleryAdapter extends PagedListAdapter<Image, GalleryAdapter.ViewH
      */
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView image;
-
+        public TextView title;
         /**
          * The constructor of the ViewHolder
          * @param itemView The item view of the adapter.
@@ -110,6 +111,7 @@ public class GalleryAdapter extends PagedListAdapter<Image, GalleryAdapter.ViewH
         ViewHolder(View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.Image);
+            title = itemView.findViewById(R.id.Title);
         }
     }
 

@@ -75,4 +75,12 @@ public class PathViewModel extends AndroidViewModel {
     public void updatePath(Path path) {
         pathRepository.updatePath(path);
     }
+
+    /**
+     * Count the path number.
+     * @return The path number.
+     */
+    public LiveData<Integer> countPathNumber() {
+        return pathRepository.countPathNumber();
+    }
 }

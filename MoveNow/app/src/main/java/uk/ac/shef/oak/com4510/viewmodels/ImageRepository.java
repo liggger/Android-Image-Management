@@ -68,6 +68,14 @@ public class ImageRepository {
     }
 
     /**
+     * Count the image number.
+     * @return The image number.
+     */
+    public LiveData<Integer> countImageNumber() {
+        return imageDao.countImageNumber();
+    }
+
+    /**
      * Insert the image using AsyncTak.
      */
     private static class InsertAsyncTask extends AsyncTask<Image, Void, Void> {

@@ -1,6 +1,7 @@
 package uk.ac.shef.oak.com4510.views.Home;
 
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -71,6 +72,7 @@ import uk.ac.shef.oak.com4510.views.Home.Service.RestartServiceBroadcastReceiver
 public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCallback {
     // The request code permissions.
     private static final int REQUEST_CODE_PERMISSIONS = 101;
+    private static final int ACCESS_FINE_LOCATION = 123;
     // The required permissions.
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
 
@@ -91,7 +93,7 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
     private int pathId;
 
     private FusedLocationProviderClient mFusedLocationClient;
-
+    private LocationRequest mLocationRequest;
     private Activity activity;
     // The current location.
     private Location mCurrentLocation;
@@ -239,6 +241,7 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
         });
+        initLocations();
     }
 
     /**
@@ -251,6 +254,33 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         mMap.getUiSettings().setZoomControlsEnabled(true);
     }
 
+    private void initLocations() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        ACCESS_FINE_LOCATION);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+
+            return;
+        }
+    }
+
     /**
      * Start updating the location for every 20 seconds.
      */
@@ -260,7 +290,7 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
           set the interval,
           set the priority.
          */
-        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(20000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -445,6 +475,23 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
         return outputStream.toByteArray();
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                            mLocationCallback, null /* Looper */);
+                } else {
+                }
+                return;
+            }
+        }
     }
 
     /**

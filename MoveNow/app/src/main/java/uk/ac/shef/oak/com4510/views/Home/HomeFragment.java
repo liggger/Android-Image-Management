@@ -1,6 +1,8 @@
 package uk.ac.shef.oak.com4510.views.Home;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,8 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -30,6 +34,7 @@ import uk.ac.shef.oak.com4510.viewmodels.PathViewModel;
 
 public class HomeFragment extends Fragment implements View.OnFocusChangeListener {
 
+    private static final int ACCESS_FINE_LOCATION = 123;
     private PathViewModel pathViewModel;
     // The title edit text.
     private EditText title;
@@ -65,6 +70,7 @@ public class HomeFragment extends Fragment implements View.OnFocusChangeListener
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
 
         // Finds the first descendant view with the editText.
         title = getView().findViewById(R.id.editText);
@@ -127,4 +133,5 @@ public class HomeFragment extends Fragment implements View.OnFocusChangeListener
     private void insertPath(PathViewModel pathViewModel, Path path) {
         pathViewModel.insertPath(path);
     }
+
 }

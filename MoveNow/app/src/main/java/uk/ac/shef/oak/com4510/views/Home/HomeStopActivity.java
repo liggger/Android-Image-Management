@@ -3,7 +3,10 @@ package uk.ac.shef.oak.com4510.views.Home;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,9 +18,11 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 
+import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -61,6 +66,7 @@ import uk.ac.shef.oak.com4510.model.Image;
 import uk.ac.shef.oak.com4510.model.Path;
 import uk.ac.shef.oak.com4510.viewmodels.ImageViewModel;
 import uk.ac.shef.oak.com4510.viewmodels.PathViewModel;
+import uk.ac.shef.oak.com4510.views.Gallery.GalleryAdapter;
 import uk.ac.shef.oak.com4510.views.Home.Service.ProcessMainClass;
 import uk.ac.shef.oak.com4510.views.Home.Service.RestartServiceBroadcastReceiver;
 
@@ -71,11 +77,9 @@ import uk.ac.shef.oak.com4510.views.Home.Service.RestartServiceBroadcastReceiver
 
 public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCallback {
     // The request code permissions.
-    private static final int REQUEST_CODE_PERMISSIONS = 101;
     private static final int ACCESS_FINE_LOCATION = 123;
-    // The required permissions.
-    private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
-
+    private static final int CAMERA_REQUEST_CODE = 124;
+    private static final int GALLERY_REQUEST_CODE = 125;
     // The EasyImage.
     private EasyImage easyImage;
     // The ImageViewModel.
@@ -93,7 +97,8 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
     private int pathId;
 
     private FusedLocationProviderClient mFusedLocationClient;
-    private LocationRequest mLocationRequest;
+    private LocationRequest mLocationRequest = new LocationRequest();
+
     private Activity activity;
     // The current location.
     private Location mCurrentLocation;
@@ -146,6 +151,8 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         // Start the pressure sensor.
         pressure_and_temperature.startPressureSensor();
 
+        initEasyImage();
+
         // Get the activity.
         activity = this;
 
@@ -166,29 +173,42 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
 
-        // Check whether the permissions are granted.
-        if (allPermissionsGranted()) {
-            // Initialize the camera.
-            initEasyImage();
-            // Start updating the location.
-            startLocationUpdates();
-        } else {
-            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
-        }
+
+        startLocationUpdates();
 
         /*
           Find the FloatingActionButton gallery,
           if clicked, open the gallery.
          */
         FloatingActionButton fabGallery = findViewById(R.id.fab_gallery);
-        fabGallery.setOnClickListener(v -> easyImage.openGallery(getActivity()));
+        fabGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String[] necessaryPermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                if (arePermissionsGranted(necessaryPermissions)) {
+                    easyImage.openGallery(HomeStopActivity.this.getActivity());
+                } else {
+                    requestPermissionsCompat(necessaryPermissions, GALLERY_REQUEST_CODE);
+                }
+            }
+        });
 
         /*
           Find the FloatingActionButton camera,
           if clicked, open the camera.
          */
         FloatingActionButton fab = findViewById(R.id.fab_camera);
-        fab.setOnClickListener(view -> easyImage.openCameraForImage(getActivity()));
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String[] necessaryPermissions = new String[]{Manifest.permission.CAMERA};
+                if (arePermissionsGranted(necessaryPermissions)) {
+                    easyImage.openCameraForImage(HomeStopActivity.this.getActivity());
+                } else {
+                    requestPermissionsCompat(necessaryPermissions, CAMERA_REQUEST_CODE);
+                }
+            }
+        });
 
         /*
           Find the textView chronometer, sets the format string used for display.
@@ -241,44 +261,19 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
             Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
         });
-        initLocations();
     }
 
     /**
-     * Initialize the GoogleMap.
-     * @param googleMap The GoogleMap.
+     * Initialize the EasyImage.
      */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-    }
-
-    private void initLocations() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-
-                // No explanation needed, we can request the permission.
-
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        ACCESS_FINE_LOCATION);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-
-            return;
-        }
+    private void initEasyImage() {
+        easyImage = new EasyImage.Builder(this)
+                .setChooserTitle("Pick the image")
+                .setCopyImagesToPublicGalleryFolder(false)
+                .setChooserType(ChooserType.CAMERA_AND_GALLERY)
+                .setFolderName("Images")
+                .allowMultiple(true)
+                .build();
     }
 
     /**
@@ -290,7 +285,6 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
           set the interval,
           set the priority.
          */
-        mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(20000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -298,7 +292,13 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         // Set the FusedLocationProviderClient.
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         // Request for a update.
-        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null /* Looper */);
+        String[] necessaryPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+
+        if (arePermissionsGranted(necessaryPermissions)) {
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null /* Looper */);
+        } else {
+            requestPermissionsCompat(necessaryPermissions, ACCESS_FINE_LOCATION);
+        }
 
         /*
           If the version is Android 7 onwards, use Job Services,
@@ -369,19 +369,6 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     protected void onPause() {
         super.onPause();
-    }
-
-    /**
-     * Initialize the EasyImage.
-     */
-    private void initEasyImage() {
-        easyImage = new EasyImage.Builder(this)
-                .setChooserTitle("Pick the image")
-                .setCopyImagesToPublicGalleryFolder(false)
-                .setChooserType(ChooserType.CAMERA_AND_GALLERY)
-                .setFolderName("Images")
-                .allowMultiple(true)
-                .build();
     }
 
     /**
@@ -477,34 +464,44 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         return outputStream.toByteArray();
     }
 
+    /**
+     * Callback for the result from requesting permissions.
+     * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions.
+     */
     @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
             case ACCESS_FINE_LOCATION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                             mLocationCallback, null /* Looper */);
-                } else {
                 }
-                return;
+            }
+            case CAMERA_REQUEST_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    easyImage.openCameraForImage(HomeStopActivity.this);
+                }
+            }
+            case GALLERY_REQUEST_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    easyImage.openGallery(HomeStopActivity.this);
+                }
             }
         }
     }
 
     /**
-     * Check whether the permissions are granted.
-     * @return True if the permissions are granted, else, return false.
+     * Initialize the GoogleMap.
+     * @param googleMap The GoogleMap.
      */
-    private boolean allPermissionsGranted () {
-         for (String permission : REQUIRED_PERMISSIONS) {
-             if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                 return false;
-             }
-         }
-         return true;
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.getUiSettings().setZoomControlsEnabled(true);
     }
 
     /**
@@ -515,4 +512,25 @@ public class HomeStopActivity extends AppCompatActivity implements OnMapReadyCal
         return activity;
     }
 
+    /**
+     * Check whether the permissions are granted.
+     * @param permissions The permission.
+     * @return True if the permissions are granted, else, false.
+     */
+    private boolean arePermissionsGranted(String[] permissions) {
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED)
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Request the permissions according to the permissions.
+     * @param permissions The permissions.
+     * @param requestCode The requestCode.
+     */
+    private void requestPermissionsCompat(String[] permissions, int requestCode) {
+        ActivityCompat.requestPermissions(getActivity(), permissions, requestCode);
+    }
 }

@@ -61,11 +61,11 @@ taken on the same path (in blue in the example)
 
 ### **Home**
 
-<img src="./diagram/Home.png" style="zoom:10%;" /><img src="./diagram/Tracking.png" style="zoom:10%;" />
+<img src="./diagram/Home.png" width="200px" /><img src="./diagram/Tracking.png" width="200px" />
 
 ### **Paths**
 
-<img src="./diagram/Paths.png" style="zoom:10%;" /><img src="./diagram/PathImage.png" style="zoom:10%;" />
+<img src="./diagram/Paths.png" width="200px" /><img src="./diagram/PathImage.png" style="zoom:10%;" />
 
 ### **Gallery**
 

@@ -65,12 +65,12 @@ taken on the same path (in blue in the example)
 
 ### **Paths**
 
-<img src="./diagram/Paths.png" width="200px" /><img src="./diagram/PathImage.png" style="zoom:10%;" />
+<img src="./diagram/Paths.png" width="200px" /><img src="./diagram/PathImage.png" width="200px" />
 
 ### **Gallery**
 
-<img src="./diagram/Gallery.png" style="zoom:10%;" /><img src="./diagram/Image.png" style="zoom:10%;" /><img src="./diagram/ImageFullSize.jpeg" style="zoom:10%;" />
+<img src="./diagram/Gallery.png" width="200px" /><img src="./diagram/Image.png" width="200px" /><img src="./diagram/ImageFullSize.jpeg" width="200px" />
 
 ### **User**
 
-<img src="./diagram/User.png" style="zoom:10%; float:left"  />
+<img src="./diagram/User.png" width="200px"  />
